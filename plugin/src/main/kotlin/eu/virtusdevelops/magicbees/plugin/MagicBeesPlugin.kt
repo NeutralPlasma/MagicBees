@@ -17,6 +17,8 @@ import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.setting.ManagerSetting
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
@@ -97,7 +99,7 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
     fun enableBStats(){
         if(!config.getBoolean("metrics")) return
         logger.info(String.format("Enabling BStats metrics for MagicBees..."))
-        val pluginId = 19226
+        val pluginId = 24838
         val metrics = Metrics(this, pluginId)
     }
 
@@ -109,4 +111,5 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
     override fun getProvidersController(): ProvidersController {
         TODO("Not yet implemented")
     }
+
 }

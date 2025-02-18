@@ -1,0 +1,17 @@
+1:
+  harvest_rewards:
+    - "Item:magic_stone:1,5"
+  comb_rewards:
+    - ""
+
+
+  upgrade_requirements:
+    - "Item:magic_stone:1"
+    - "Vault:1000.0"
+    - "VotingPlugin:100"
+
+  harvest_requirements:
+    - "Item:glass_bottle:<amount>"
+    - "Vault:1000.0"
+  comb_requirements:
+    - ""

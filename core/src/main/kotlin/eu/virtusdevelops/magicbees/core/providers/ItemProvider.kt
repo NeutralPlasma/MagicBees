@@ -1,6 +1,8 @@
 package eu.virtusdevelops.magicbees.core.providers
 
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
+import eu.virtusdevelops.magicbees.core.utils.ItemData
+import eu.virtusdevelops.magicbees.core.utils.ItemUtils
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -27,11 +29,8 @@ class ItemProvider : AdvancedProvider<String, Int> {
 
     override fun give(player: Player, value: String, amount: Int): Boolean {
         val item = items[value]?.clone() ?: return false
-
-        // add player utils for item giving
-        // try to give to player if no space return false
         item.amount = amount
-        player.inventory.addItem(item)
+        ItemUtils.give(player, item)
         return true
     }
 
@@ -41,7 +40,13 @@ class ItemProvider : AdvancedProvider<String, Int> {
 
 
     override fun take(player: Player, value: String, amount: Int): Boolean {
-        TODO("Not yet implemented")
+        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false)
+        if(count < amount){
+            return false
+        }else if(count > amount){
+            ItemUtils.remove(player.inventory, getItem(value) ?: return false, count - amount)
+        }
+        return true
     }
 
     override fun take(player: Player, value: String): Boolean {
@@ -50,7 +55,7 @@ class ItemProvider : AdvancedProvider<String, Int> {
 
 
     override fun has(player: Player, value: String, amount: Int): Boolean {
-        TODO("Not yet implemented")
+        return ItemUtils.count(player.inventory, getItem(value) ?: return false) >= amount
     }
 
     override fun has(player: Player, value: String): Boolean {
@@ -59,9 +64,13 @@ class ItemProvider : AdvancedProvider<String, Int> {
 
 
     override fun set(player: Player, value: String, amount: Int): Boolean {
-        // first check if player already has the item, if he has it then set the amount to the new amount
-        // if player doesnt have the item give the set amount
-        TODO("Not yet implemented")
+        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false)
+        if(count < amount){
+            ItemUtils.give(player, getItem(value) ?: return false, amount - count)
+        }else if(count > amount){
+            ItemUtils.remove(player.inventory, getItem(value) ?: return false, count - amount)
+        }
+        return true
     }
 
     override fun set(player: Player, value: String): Boolean {

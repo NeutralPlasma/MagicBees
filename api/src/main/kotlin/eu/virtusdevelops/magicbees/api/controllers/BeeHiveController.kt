@@ -2,6 +2,7 @@ package eu.virtusdevelops.magicbees.api.controllers
 
 import eu.virtusdevelops.magicbees.api.models.BeeHive
 import eu.virtusdevelops.magicbees.api.models.Location
+import org.bukkit.entity.Player
 import java.util.UUID
 
 interface BeeHiveController {
@@ -20,4 +21,7 @@ interface BeeHiveController {
 
     fun getBeehive(location: Location): BeeHive?
 
+    fun harvestBeeHive(player: Player, beeHive: BeeHive): Boolean
+
+    fun combBeeHive(player: Player, beeHive: BeeHive): Boolean
 }

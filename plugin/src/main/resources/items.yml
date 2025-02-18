@@ -1,0 +1,10 @@
+magic_stone:
+  name: ""
+  material: ""
+  lore:
+    - ""
+magic_shard:
+  base64: ""
+
+glass_bottle:
+  material: "GLASS_BOTTLE"

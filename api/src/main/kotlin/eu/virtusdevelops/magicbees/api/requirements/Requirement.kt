@@ -1,4 +1,4 @@
-package eu.virtusdevelops.magicbees.api.models
+package eu.virtusdevelops.magicbees.api.requirements
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
