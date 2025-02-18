@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/gui" />
             <option value="$PROJECT_DIR$/plugin" />
           </set>
         </option>

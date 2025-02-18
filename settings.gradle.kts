@@ -43,3 +43,4 @@ rootProject.name = "MagicBees"
 include(":api")
 include(":core")
 include(":plugin")
+include(":gui")
