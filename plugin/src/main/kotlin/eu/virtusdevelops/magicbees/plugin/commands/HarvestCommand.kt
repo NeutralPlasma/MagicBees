@@ -2,6 +2,7 @@ package eu.virtusdevelops.magicbees.plugin.commands
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.models.Location
+import eu.virtusdevelops.magicbees.gui.guis.BeeHiveMenu
 import eu.virtusdevelops.magicbees.plugin.MagicBeesPlugin
 import org.bukkit.entity.Player
 import org.incendo.cloud.annotations.*
@@ -50,7 +51,7 @@ class HarvestCommand : AbstractCommand {
                 beeHiveController.combBeeHive(ctx.source() as Player, beehive)
             }
             else -> {
-                ctx.source().sendMessage("Invalid action!")
+                BeeHiveMenu(ctx.source() as Player, beehive)
             }
         }
 

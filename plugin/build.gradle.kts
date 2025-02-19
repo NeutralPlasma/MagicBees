@@ -18,6 +18,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":api"))
+    implementation(project(":gui"))
     implementation(libs.bundles.cloudEcosystem)
 
     implementation("org.bstats:bstats-bukkit:3.0.2")

@@ -6,6 +6,7 @@ import eu.virtusdevelops.magicbees.core.controllers.*
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
 import eu.virtusdevelops.magicbees.core.storage.mysql.BeeHiveMysql
+import eu.virtusdevelops.magicbees.gui.GuiController
 import eu.virtusdevelops.magicbees.plugin.commands.CommandRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -30,6 +31,8 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
     private lateinit var requirementsController: RequirementsController
     private lateinit var rewardsController: RewardsController
     private lateinit var translationsController: TranslationsController
+
+    private lateinit var guiController: GuiController
 
     override fun onEnable() {
         saveDefaultConfig()
@@ -65,9 +68,11 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
             requirementsController,
             rewardsController
         )
-
-
         beehiveController.initialize()
+
+        guiController = GuiController(this)
+        guiController.init()
+
     }
 
 
