@@ -4,6 +4,8 @@ import eu.virtusdevelops.magicbees.api.Provider
 
 interface ProvidersController {
 
+
+
     fun registerProvider(provider: Provider<*>)
 
     fun unregisterProvider(provider: Provider<*>)
@@ -13,4 +15,6 @@ interface ProvidersController {
     fun getProvider(providerType: String): Provider<*>?
 
     fun getProvider(returnType: Class<*>): Set<Provider<*>>?
+
+    fun getAll(): Set<Provider<*>>
 }

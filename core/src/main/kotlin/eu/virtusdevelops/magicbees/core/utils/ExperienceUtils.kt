@@ -16,6 +16,9 @@ class ExperienceUtils {
          * @see [Experience.Leveling_up](http://minecraft.gamepedia.com/Experience.Leveling_up)
          */
         fun getExp(player: Player): Int {
+
+            player.totalExperience
+
             return (getExpFromLevel(player.level)
                     + Math.round(getExpToNext(player.level) * player.exp))
         }

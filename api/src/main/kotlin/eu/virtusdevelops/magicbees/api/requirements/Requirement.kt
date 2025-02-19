@@ -21,6 +21,14 @@ interface Requirement{
      */
     fun processRequirement(player: Player): Boolean
 
+    /**
+     * Retrieves the name associated, used for messages
+     *
+     * @return The name as a string.
+     */
+    fun getName(): String
+
+    fun getType(): String
 
     /**
      * Retrieves the icon associated with the requirement.

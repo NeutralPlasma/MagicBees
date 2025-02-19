@@ -1,8 +1,11 @@
 package eu.virtusdevelops.magicbees.plugin
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
-import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
-import eu.virtusdevelops.magicbees.api.controllers.ProvidersController
+import eu.virtusdevelops.magicbees.api.controllers.*
+import eu.virtusdevelops.magicbees.core.controllers.*
+import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
+import eu.virtusdevelops.magicbees.core.storage.FileStorage
+import eu.virtusdevelops.magicbees.core.storage.mysql.BeeHiveMysql
 import eu.virtusdevelops.magicbees.plugin.commands.CommandRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -17,17 +20,24 @@ import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.setting.ManagerSetting
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
     private lateinit var minecraftHelp: MinecraftHelp<Source>
 
+    private lateinit var beehiveController: BeeHiveController
+    private lateinit var providersController: ProvidersController
+    private lateinit var requirementsController: RequirementsController
+    private lateinit var rewardsController: RewardsController
+    private lateinit var translationsController: TranslationsController
+
     override fun onEnable() {
         saveDefaultConfig()
         enableBStats()
 
+        // todo: setup storage
+
+        registerControllers()
         // setup API
         MagicBeesAPI.setImplementation(this)
 
@@ -42,6 +52,23 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
         logger.info("Successfully disabled MagicBees!")
     }
 
+
+    private fun registerControllers(){
+        translationsController = TranslationsControllerImpl()
+        providersController = ProvidersControllerImpl(this)
+        requirementsController = RequirementsControllerImpl()
+        rewardsController = RewardsControllerImpl()
+
+        beehiveController = BeeHiveControllerImpl(
+            FileStorage(this, "levels.yml"),
+            BeeHiveMysql(),
+            requirementsController,
+            rewardsController
+        )
+
+
+        beehiveController.initialize()
+    }
 
 
     private fun registerCommands(){
@@ -105,11 +132,27 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
 
     override fun getBeeHiveController(): BeeHiveController {
-        TODO("Not yet implemented")
+        return beehiveController
     }
 
     override fun getProvidersController(): ProvidersController {
-        TODO("Not yet implemented")
+        return providersController
     }
 
+    override fun getRequirementsController(): RequirementsController {
+        return requirementsController
+    }
+
+    override fun getRewardsController(): RewardsController {
+        return rewardsController
+    }
+
+    override fun getTranslationsController(): TranslationsController {
+        return translationsController
+    }
+
+    override fun reload() {
+        providersController.getAll().forEach {  it.init() }
+        beehiveController.initialize()
+    }
 }

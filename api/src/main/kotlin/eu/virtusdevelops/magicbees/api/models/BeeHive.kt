@@ -21,16 +21,17 @@ data class BeeHive(
     val id: UUID,
     val location: Location,
     val owner: UUID,
-    val fullnessStatus: Int,
-    val bees: Int,
-    val honeyUpgradeLevel: Int,
-    val honeyCombUpgradeLevel: Int,
+    var fullnessStatus: Int,
+    var bees: Int,
+    var honeyUpgradeLevel: Int,
+    var honeyCombUpgradeLevel: Int,
 
-    val combCollectedTimes: Int,
-    val lastCollectionTime: Long,
+    var combCollectedTimes: Int,
+    var honeyCollectedTimes: Int,
+    var lastCollectionTime: Long,
 
-    val createdTime: Long,
+    var createdTime: Long,
 
-    val modifiedTime: Long
+    var modifiedTime: Long
 ) {
 }

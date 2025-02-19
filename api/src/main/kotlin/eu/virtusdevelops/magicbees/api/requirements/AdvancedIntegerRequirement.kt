@@ -5,17 +5,19 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class ItemRequirement(private val itemName: String, private val itemAmount: Int, private val provider: AdvancedProvider<String, Int>) :
-    Requirement {
+class AdvancedIntegerRequirement(
+    private val key: String,
+    private val amount: Int,
+    private val provider: AdvancedProvider<String, Int>) : Requirement {
 
 
 
     override fun check(player: Player): Boolean {
-        return provider.has(player, itemName, itemAmount)
+        return provider.has(player, key, amount)
     }
 
     override fun processRequirement(player: Player): Boolean {
-        return provider.take(player, itemName, itemAmount)
+        return provider.take(player, key, amount)
     }
 
     override fun getIcon(): ItemStack {
@@ -25,4 +27,8 @@ class ItemRequirement(private val itemName: String, private val itemAmount: Int,
         /*return provider.getItem(itemName) ?: */
         return ItemStack(Material.DIAMOND)
     }
+
+    override fun getName(): String = "$amount"
+
+    override fun getType(): String = key
 }

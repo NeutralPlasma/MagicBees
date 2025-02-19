@@ -1,4 +1,4 @@
-package eu.virtusdevelops.magicbees.core.requirements.parsers
+package eu.virtusdevelops.magicbees.core.requirements
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.Provider

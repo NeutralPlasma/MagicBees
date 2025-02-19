@@ -5,6 +5,8 @@ import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
 
 interface RequirementsController {
 
+    fun getAllParsers(): Set<RequirementParser>
+
     fun registerRequirementParser(parser: RequirementParser)
 
     fun getRequirements(data: List<String>): List<Requirement>

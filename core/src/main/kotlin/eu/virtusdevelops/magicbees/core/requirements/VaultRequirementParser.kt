@@ -1,4 +1,4 @@
-package eu.virtusdevelops.magicbees.core.requirements.parsers
+package eu.virtusdevelops.magicbees.core.requirements
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.Provider
@@ -14,11 +14,12 @@ class VaultRequirementParser : RequirementParser {
 
     override fun parse(data: String): Requirement {
         val split = data.split(":")
-        if(split.size != 3) throw IllegalArgumentException("Invalid data format!")
+        if(split.size != 2) throw IllegalArgumentException("Invalid data format!")
 
         val provider = MagicBeesAPI.get()?.getProvidersController()?.getProvider("Vault")
-            ?: throw IllegalStateException("Item provider is not present!")
+            ?: throw IllegalStateException("Vault provider is not present!")
 
         return DoubleRequirement(split[1].toDouble(), provider as Provider<Double>)
     }
+
 }

@@ -272,6 +272,7 @@ object ItemUtils {
     ): Int {
         var count = 0
         for (i in inv) {
+            if(i == null) continue
             if (comparison.test(item, i)) {
                 count += i.amount
             }

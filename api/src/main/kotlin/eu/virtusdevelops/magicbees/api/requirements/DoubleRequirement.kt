@@ -30,4 +30,7 @@ class DoubleRequirement (private val amount: Double,
         return "${provider.getName()}:$amount"
     }
 
+    override fun getName(): String = "$amount"
+
+    override fun getType(): String = provider.getName()
 }

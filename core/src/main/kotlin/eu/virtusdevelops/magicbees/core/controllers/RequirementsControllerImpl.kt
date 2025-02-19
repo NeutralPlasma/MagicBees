@@ -1,23 +1,21 @@
-package eu.virtusdevelops.magicbees.core.requirements
+package eu.virtusdevelops.magicbees.core.controllers
 
 import eu.virtusdevelops.magicbees.api.controllers.RequirementsController
 import eu.virtusdevelops.magicbees.api.requirements.Requirement
 import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
-import eu.virtusdevelops.magicbees.core.requirements.parsers.ExperienceRequirementParser
-import eu.virtusdevelops.magicbees.core.requirements.parsers.ItemRequirementParser
-import eu.virtusdevelops.magicbees.core.requirements.parsers.VaultRequirementParser
-import eu.virtusdevelops.magicbees.core.requirements.parsers.VotingPluginRequirementParser
+import eu.virtusdevelops.magicbees.core.requirements.*
 
 class RequirementsControllerImpl: RequirementsController {
+
+    private val requirementParsers: MutableMap<String, RequirementParser> = mutableMapOf()
 
     init {
         registerRequirementParser(ItemRequirementParser())
         registerRequirementParser(VaultRequirementParser())
         registerRequirementParser(VotingPluginRequirementParser())
         registerRequirementParser(ExperienceRequirementParser())
+        registerRequirementParser(CoinsEngineRequirementParser())
     }
-
-    private val requirementParsers: MutableMap<String, RequirementParser> = mutableMapOf()
 
 
     override fun registerRequirementParser(parser: RequirementParser) {
@@ -31,4 +29,6 @@ class RequirementsControllerImpl: RequirementsController {
         }
         return requirements
     }
+
+    override fun getAllParsers(): Set<RequirementParser> = requirementParsers.values.toSet()
 }

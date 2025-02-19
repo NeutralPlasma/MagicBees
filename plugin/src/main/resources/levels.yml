@@ -1,17 +1,13 @@
 1:
   harvest_rewards:
-    - "Item:magic_stone:1,5"
+    - "Item:honey:1,3"
   comb_rewards:
-    - ""
-
-
-  upgrade_requirements:
-    - "Item:magic_stone:1"
-    - "Vault:1000.0"
-    - "VotingPlugin:100"
-
+    - "Item:honey_comb:1,2"
   harvest_requirements:
-    - "Item:glass_bottle:<amount>"
-    - "Vault:1000.0"
+    - "Item:glass_bottle:1"
   comb_requirements:
+    - "Durability:shears:1"
+  honey_upgrade_requirements:
+    - ""
+  comb_upgrade_requirements:
     - ""

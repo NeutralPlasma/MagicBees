@@ -1,5 +1,6 @@
 package eu.virtusdevelops.magicbees.plugin.commands
 
+import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
 import eu.virtusdevelops.magicbees.plugin.MagicBeesPlugin
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
@@ -9,7 +10,10 @@ class CommandRegistry(private val plugin: MagicBeesPlugin, private val manager: 
     private val annotationParser: AnnotationParser<Source> = AnnotationParser(manager, Source::class.java)
 
     private val commands: List<AbstractCommand> = listOf(
-        HelpCommand()
+        HelpCommand(),
+        HarvestCommand(),
+        DebugCommand(),
+        ReloadCommand()
     )
 
     init {

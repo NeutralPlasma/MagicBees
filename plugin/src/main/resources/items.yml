@@ -1,10 +1,10 @@
-magic_stone:
-  name: ""
-  material: ""
+honey:
+  material: "HONEY_BOTTLE"
   lore:
-    - ""
-magic_shard:
-  base64: ""
+    - "<gray>Tasty and delicious"
+
+honey_comb:
+  material: "HONEYCOMB"
 
 glass_bottle:
   material: "GLASS_BOTTLE"

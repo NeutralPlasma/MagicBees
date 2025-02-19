@@ -12,10 +12,15 @@ val jdkVersion: Int by rootProject
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+
+    compileOnly(libs.votingPlugin)
+
+    compileOnly(libs.coinsEngine){
+        exclude(group = "org.spigotmc", module = "spigot-api")
+    }
     compileOnly(libs.vault){
         exclude(group = "org.bukkit", module = "bukkit")
     }
-    compileOnly(libs.votingPlugin)
 
     implementation(project(":api"))
 

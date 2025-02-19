@@ -29,5 +29,7 @@ class IntegerRequirement (private val amount: Int,
         return "${provider.getName()}:$amount"
     }
 
+    override fun getName(): String = "$amount"
 
+    override fun getType(): String = provider.getName()
 }

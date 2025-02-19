@@ -40,7 +40,7 @@ bukkit {
     foliaSupported = false
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     authors = authorsList
-    softDepend = listOf("Vault")
+    softDepend = listOf("Vault", "CoinsEngine", "VotingPlugin")
 }
 
 tasks {

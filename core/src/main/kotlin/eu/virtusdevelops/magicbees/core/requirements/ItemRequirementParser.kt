@@ -1,10 +1,10 @@
-package eu.virtusdevelops.magicbees.core.requirements.parsers
+package eu.virtusdevelops.magicbees.core.requirements
 
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.requirements.Requirement
 import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
-import eu.virtusdevelops.magicbees.api.requirements.ItemRequirement
+import eu.virtusdevelops.magicbees.api.requirements.AdvancedIntegerRequirement
 
 class ItemRequirementParser : RequirementParser {
 
@@ -27,6 +27,6 @@ class ItemRequirementParser : RequirementParser {
         val itemAmount = split[2].toInt()
         val itemName = split[1]
 
-        return ItemRequirement(itemName, itemAmount, provider as AdvancedProvider<String, Int>)
+        return AdvancedIntegerRequirement(itemName, itemAmount, provider as AdvancedProvider<String, Int>)
     }
 }

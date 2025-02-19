@@ -24,4 +24,8 @@ interface BeeHiveController {
     fun harvestBeeHive(player: Player, beeHive: BeeHive): Boolean
 
     fun combBeeHive(player: Player, beeHive: BeeHive): Boolean
+
+    fun upgradeHoneyLevel(player: Player, beeHive: BeeHive): Boolean
+
+    fun upgradeCombLevel(player: Player, beeHive: BeeHive): Boolean
 }
