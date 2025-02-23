@@ -9,7 +9,5 @@ interface CrudDao<T, ID> {
 
     fun save(t: T): Boolean
 
-    fun update(t: T): Boolean
-
     fun delete(t: T): Boolean
 }

@@ -4,42 +4,36 @@ import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
 import eu.virtusdevelops.magicbees.api.controllers.RequirementsController
 import eu.virtusdevelops.magicbees.api.controllers.RewardsController
-import eu.virtusdevelops.magicbees.api.models.BeeHive
-import eu.virtusdevelops.magicbees.api.models.BeeHiveLevel
-import eu.virtusdevelops.magicbees.api.models.Location
-import eu.virtusdevelops.magicbees.api.models.Messages
+import eu.virtusdevelops.magicbees.api.models.*
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.logging.Logger
 
 class BeeHiveControllerImpl(
     private val levelsStorage: FileStorage,
-    private val dao: BeeHiveDao,
     private val requirementsController: RequirementsController,
-    private val rewardsController: RewardsController) : BeeHiveController {
+    private val rewardsController: RewardsController,
+    private val storageController: StorageController,
+    private val logger: Logger) : BeeHiveController {
 
-    private val beehives: ConcurrentHashMap<Location, BeeHive> = ConcurrentHashMap()
+    private val beeHiveStorage = storageController.getBeeHiveStorage()
     private val beeHiveLevels: HashMap<Int, BeeHiveLevel> = HashMap()
 
 
 
-    private val executorService: ExecutorService = Executors.newFixedThreadPool(2)
+
 
     override fun initialize(): Boolean {
         // load all beehives
         beeHiveLevels.clear()
-        beehives.clear()
-        try{
-            //dao.getAll().forEach { beehives[it.location] = it }
-        }catch (e: Exception){
-            return false
-        }
 
         // load levels from filestorage
         levelsStorage.loadData()
@@ -50,75 +44,19 @@ class BeeHiveControllerImpl(
                 beeHiveLevels[level.level] = level
         }
 
-        // temporary
-        /*beeHiveLevels[1] = BeeHiveLevel(
-            1,
-            listOf("Item:gravel:128"),
-            listOf(),
-            listOf(),
-            listOf(),
-            listOf("Item:some_magic:1:5"),
-            listOf("Item:gravel:1:5"),
-        )*/
-
-        val location = Location(0, 0, 0, "world")
-        beehives[location] = BeeHive(
-            UUID.randomUUID(),
-            location,
-            UUID.randomUUID(),
-            5,
-            3,
-            1,
-            1,
-            0,
-            0,
-            0,
-            System.currentTimeMillis(),
-            System.currentTimeMillis()
-        )
-
         return true
     }
 
     override fun saveBeeHive(beeHive: BeeHive) {
-
-        executorService.submit {
-            if(!dao.save(beeHive))
-                beehives.remove(beeHive.location)
-        }
-
-        beehives[beeHive.location] = beeHive
+        beeHiveStorage.store(beeHive)
     }
 
     override fun removeBeeHive(beeHive: BeeHive) {
-        executorService.submit {
-            if (!dao.delete(beeHive))
-                beehives[beeHive.location] = beeHive
-        }
-        beehives.remove(beeHive.location)
-    }
-
-    override fun getBeeHives(): Set<BeeHive> {
-        return beehives.values.toSet()
-    }
-
-    override fun getPlayerBeehives(playerUUID: UUID): Set<BeeHive> {
-        val set: MutableSet<BeeHive> = mutableSetOf()
-        for (beehive in beehives) {
-            if(beehive.value.owner.equals(playerUUID)) set.add(beehive.value)
-        }
-        return set;
-    }
-
-    override fun getBeehive(beeHiveUUID: UUID): BeeHive? {
-        for (beeHive in beehives.values) {
-            if(beeHive.id.equals(beeHiveUUID)) return beeHive
-        }
-        return null
+        beeHiveStorage.remove(beeHive)
     }
 
     override fun getBeehive(location: Location): BeeHive? {
-        return beehives[location]
+        return beeHiveStorage.get(location)
     }
 
     override fun harvestBeeHive(player: Player, beeHive: BeeHive): Boolean {
@@ -262,6 +200,14 @@ class BeeHiveControllerImpl(
         return true
     }
 
+    override fun loadChunk(chunk: ChunkLocation, world: String) {
+        beeHiveStorage.loadChunkAsync(chunk, world)
+    }
+
+    override fun unloadChunk(chunk: ChunkLocation, world: String) {
+        beeHiveStorage.unloadChunk(chunk, world)
+    }
+
 
     fun parseHoneyLevel(data: ConfigurationSection): BeeHiveLevel? {
         try{
@@ -288,4 +234,6 @@ class BeeHiveControllerImpl(
             return null
         }
     }
+
+
 }

@@ -6,6 +6,7 @@ import eu.virtusdevelops.magicbees.core.controllers.*
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
 import eu.virtusdevelops.magicbees.core.storage.mysql.BeeHiveMysql
+import eu.virtusdevelops.magicbees.core.utils.NBTUtil
 import eu.virtusdevelops.magicbees.gui.GuiController
 import eu.virtusdevelops.magicbees.plugin.commands.CommandRegistry
 import net.kyori.adventure.text.Component
@@ -31,6 +32,7 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
     private lateinit var requirementsController: RequirementsController
     private lateinit var rewardsController: RewardsController
     private lateinit var translationsController: TranslationsController
+    private lateinit var storageController: StorageController
 
     private lateinit var guiController: GuiController
 
@@ -38,6 +40,7 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
         saveDefaultConfig()
         enableBStats()
 
+        NBTUtil.load(this)
         // todo: setup storage
 
         registerControllers()
@@ -57,6 +60,7 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
 
     private fun registerControllers(){
+        storageController = StorageController(this)
         translationsController = TranslationsControllerImpl()
         providersController = ProvidersControllerImpl(this)
         requirementsController = RequirementsControllerImpl()

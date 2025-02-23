@@ -7,11 +7,9 @@ import su.nightexpress.coinsengine.api.CoinsEngineAPI
 
 class CoinsEngineProvider : AdvancedProvider<String, Double> {
 
-
     override fun init() {
 
     }
-
     override fun isInitialized(): Boolean {
         return Bukkit.getPluginManager().isPluginEnabled("CoinsEngine")
     }
@@ -19,7 +17,6 @@ class CoinsEngineProvider : AdvancedProvider<String, Double> {
     override fun getName(): String {
         return "CoinsEngine"
     }
-
 
     override fun give(player: Player, value: String, amount: Double): Boolean {
         val currency = CoinsEngineAPI.getCurrency(value) ?: return false
@@ -63,6 +60,4 @@ class CoinsEngineProvider : AdvancedProvider<String, Double> {
     override fun set(player: Player, value: String): Boolean {
         return set(player, value, 1.0)
     }
-
-
 }
