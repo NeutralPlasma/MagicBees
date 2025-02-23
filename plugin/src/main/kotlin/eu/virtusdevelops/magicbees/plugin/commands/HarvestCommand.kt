@@ -1,9 +1,10 @@
 package eu.virtusdevelops.magicbees.plugin.commands
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
-import eu.virtusdevelops.magicbees.api.models.Location
 import eu.virtusdevelops.magicbees.gui.guis.BeeHiveMenu
 import eu.virtusdevelops.magicbees.plugin.MagicBeesPlugin
+import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.incendo.cloud.annotations.*
 import org.incendo.cloud.annotations.suggestion.Suggestions
@@ -34,7 +35,7 @@ class HarvestCommand : AbstractCommand {
             action = query
         }
 
-        val location = Location(0, 0, 0, "world")
+        val location = Location(Bukkit.getWorld("world"), 0.0, 0.0, 0.0)
         val beeHiveController = MagicBeesAPI.get()!!.getBeeHiveController()
         val beehive = beeHiveController.getBeehive(location)
 

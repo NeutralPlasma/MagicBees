@@ -19,7 +19,8 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":api"))
     implementation(project(":gui"))
-    implementation(libs.bundles.cloudEcosystem)
+
+    compileOnly(libs.bundles.cloudEcosystem)
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
 }
@@ -42,6 +43,17 @@ bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     authors = authorsList
     softDepend = listOf("Vault", "CoinsEngine", "VotingPlugin")
+    libraries = listOf(
+        "org.incendo:cloud-core:2.0.0",
+        "org.incendo:cloud-annotations:2.0.0",
+        "org.incendo:cloud-paper:2.0.0-beta.10",
+        "org.incendo:cloud-minecraft-extras:2.0.0-beta.10",
+
+        "net.kyori:adventure-platform-bukkit:4.3.4",
+
+        "com.zaxxer:HikariCP:5.0.1",
+        "com.h2database:h2:2.3.232"
+    )
 }
 
 tasks {

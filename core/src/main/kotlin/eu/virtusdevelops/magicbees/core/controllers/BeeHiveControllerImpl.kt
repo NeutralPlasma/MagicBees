@@ -7,10 +7,18 @@ import eu.virtusdevelops.magicbees.api.controllers.RewardsController
 import eu.virtusdevelops.magicbees.api.models.*
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
+import eu.virtusdevelops.magicbees.core.utils.NBTUtil
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
@@ -18,6 +26,7 @@ import java.util.concurrent.Executors
 import java.util.logging.Logger
 
 class BeeHiveControllerImpl(
+    private val plugin: JavaPlugin,
     private val levelsStorage: FileStorage,
     private val requirementsController: RequirementsController,
     private val rewardsController: RewardsController,
@@ -59,34 +68,135 @@ class BeeHiveControllerImpl(
         return beeHiveStorage.get(location)
     }
 
-    override fun harvestBeeHive(player: Player, beeHive: BeeHive): Boolean {
+    override fun canHarvest(player: Player, beeHive: BeeHive): Result<Boolean, List<String>> {
+        val errors = mutableListOf<String>()
         if(beeHive.fullnessStatus == 0){
-            MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.HIVE_EMPTY)
-            return false
+            errors.add(MagicBeesAPI.get()?.getTranslationsController()?.getString(Messages.HIVE_EMPTY) ?: Messages.HIVE_EMPTY.toString())
+            return Result.failure(errors)
         }
-
         if(!beeHiveLevels.containsKey(beeHive.honeyUpgradeLevel)){
+            errors.add("Missing configuration for honey comb level ${beeHive.honeyUpgradeLevel}!")
+            return Result.failure(errors)
+        }
+        val levelData = beeHiveLevels[beeHive.honeyUpgradeLevel]!!
+        val requirements = requirementsController.getRequirements(levelData.harvestRequirements)
+        var passed = true
+        requirements.forEach {
+            if(!it.check(player)){
+                passed = false
+                // send message
+                errors.add(
+                    MagicBeesAPI.get()?.getTranslationsController()?.getString(Messages.MISSING_REQUIREMENT, it.getName(), it.getType()) ?:
+                    "${Messages.MISSING_REQUIREMENT} ${it.getName()} ${it.getType()}"
+                )
+            }
+        }
+        if(passed)
+            return Result.success(true)
+        return Result.failure(errors)
+    }
+
+    override fun canComb(player: Player, beeHive: BeeHive): Result<Boolean, List<String>> {
+        val errors = mutableListOf<String>()
+        if(beeHive.fullnessStatus == 0){
+            errors.add(MagicBeesAPI.get()?.getTranslationsController()?.getString(Messages.HIVE_EMPTY) ?: Messages.HIVE_EMPTY.toString())
+            return Result.failure(errors)
+        }
+        if(!beeHiveLevels.containsKey(beeHive.honeyCombUpgradeLevel)){
+            errors.add("Missing configuration for honey comb level ${beeHive.honeyCombUpgradeLevel}!")
+            return Result.failure(errors)
+        }
+        val levelData = beeHiveLevels[beeHive.honeyCombUpgradeLevel]!!
+        val requirements = requirementsController.getRequirements(levelData.combRequirements)
+        var passed = true
+        requirements.forEach {
+            if(!it.check(player)){
+                passed = false
+                // send message
+                errors.add(
+                    MagicBeesAPI.get()?.getTranslationsController()?.getString(Messages.MISSING_REQUIREMENT, it.getName(), it.getType()) ?:
+                    "${Messages.MISSING_REQUIREMENT} ${it.getName()} ${it.getType()}"
+                )
+            }
+        }
+        if(passed)
+            return Result.success(true)
+        return Result.failure(errors)
+    }
+
+    // can upgrade honey
+    override fun canUpgradeHoneyLevel(player: Player, beeHive: BeeHive): Result<Boolean, List<String>> {
+        val errors = mutableListOf<String>()
+        val nextLevel = beeHive.honeyUpgradeLevel + 1
+        if(!beeHiveLevels.containsKey(nextLevel)){
+            errors.add("Missing configuration for honey comb level ${beeHive.honeyUpgradeLevel}!")
+            return Result.failure(errors)
+        }
+        val levelData = beeHiveLevels[nextLevel]!!
+        // requirements
+        val requirements = requirementsController.getRequirements(levelData.honeyUpgradeRequirements)
+
+        var passed = true
+        requirements.forEach {
+            if(!it.check(player)){
+                passed = false
+                errors.add(
+                    MagicBeesAPI.get()?.getTranslationsController()
+                        ?.getString(Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
+                        ?: (Messages.MISSING_REQUIREMENT.name + ":" + it.getName() + ":" + it.getType())
+                )
+            }
+        }
+        if(!passed)
+            return Result.failure(errors)
+        return Result.success(true)
+    }
+
+    // can upgrade comb
+    override fun canUpgradeCombLevel(player: Player, beeHive: BeeHive): Result<Boolean, List<String>> {
+        val errors = mutableListOf<String>()
+        val nextLevel = beeHive.honeyCombUpgradeLevel + 1
+        if(!beeHiveLevels.containsKey(nextLevel)){
+            errors.add("Missing configuration for honey comb level ${beeHive.honeyCombUpgradeLevel}!")
+            return Result.failure(errors)
+        }
+        val levelData = beeHiveLevels[nextLevel]!!
+        // requirements
+        val requirements = requirementsController.getRequirements(levelData.combUpgradeRequirements)
+
+        var passed = true
+        requirements.forEach {
+            if(!it.check(player)){
+                passed = false
+                errors.add(
+                    MagicBeesAPI.get()?.getTranslationsController()
+                        ?.getString(Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
+                        ?: (Messages.MISSING_REQUIREMENT.name + ":" + it.getName() + ":" + it.getType())
+                )
+            }
+        }
+        if(!passed)
+            return Result.failure(errors)
+        return Result.success(true)
+    }
+
+    override fun harvestBeeHive(player: Player, beeHive: BeeHive): Boolean {
+
+        val result = canHarvest(player, beeHive)
+        if(result is Result.Failure){
+            result.errors.forEach{
+                player.sendMessage(MiniMessage.miniMessage().deserialize(it))
+            }
             return false
         }
         val levelData = beeHiveLevels[beeHive.honeyUpgradeLevel]!!
 
         val requirements = requirementsController.getRequirements(levelData.harvestRequirements)
 
-        var passed = true
-        requirements.forEach {
-            if(!it.check(player)){
-                passed = false
-                // send message
-                MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
-            }
-        }
-        if(!passed) return false
-
 
         requirements.forEach {
             it.processRequirement(player)
         }
-
 
         beeHive.honeyCollectedTimes += 1
         beeHive.fullnessStatus = 0
@@ -102,33 +212,21 @@ class BeeHiveControllerImpl(
     }
 
     override fun combBeeHive(player: Player, beeHive: BeeHive): Boolean {
-        if(beeHive.fullnessStatus == 0){
-            MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.HIVE_EMPTY)
-            return false
-        }
 
-        if(!beeHiveLevels.containsKey(beeHive.honeyCombUpgradeLevel)){
-            return false
-        }
-        val levelData = beeHiveLevels[beeHive.honeyCombUpgradeLevel]!!
-
-        val requirements = requirementsController.getRequirements(levelData.combRequirements)
-
-        var passed = true
-        requirements.forEach {
-            if(!it.check(player)){
-                passed = false
-                // send message
-                MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
+        val result = canComb(player, beeHive)
+        if(result is Result.Failure){
+            result.errors.forEach{
+                player.sendMessage(MiniMessage.miniMessage().deserialize(it))
             }
+            return false
         }
-        if(!passed) return false
 
+        val levelData = beeHiveLevels[beeHive.honeyCombUpgradeLevel]!!
+        val requirements = requirementsController.getRequirements(levelData.combRequirements)
 
         requirements.forEach {
             it.processRequirement(player)
         }
-
 
         beeHive.combCollectedTimes += 1
         beeHive.fullnessStatus = 0
@@ -144,23 +242,21 @@ class BeeHiveControllerImpl(
 
     }
 
+
+
     override fun upgradeHoneyLevel(player: Player, beeHive: BeeHive): Boolean {
         val nextLevel = beeHive.honeyUpgradeLevel + 1
-        if(!beeHiveLevels.containsKey(nextLevel)){
+        val result = canUpgradeHoneyLevel(player, beeHive)
+        if(result is Result.Failure){
+            result.errors.forEach{
+                player.sendMessage(MiniMessage.miniMessage().deserialize(it))
+            }
             return false
         }
+
         val levelData = beeHiveLevels[nextLevel]!!
         // requirements
         val requirements = requirementsController.getRequirements(levelData.honeyUpgradeRequirements)
-
-        var passed = true
-        requirements.forEach {
-            if(!it.check(player)){
-                passed = false
-                MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
-            }
-        }
-        if(!passed) return false
 
         requirements.forEach {
             it.processRequirement(player)
@@ -174,21 +270,19 @@ class BeeHiveControllerImpl(
 
     override fun upgradeCombLevel(player: Player, beeHive: BeeHive): Boolean {
         val nextLevel = beeHive.honeyCombUpgradeLevel + 1
-        if(!beeHiveLevels.containsKey(nextLevel)){
+
+
+        val result = canUpgradeCombLevel(player, beeHive)
+        if(result is Result.Failure){
+            result.errors.forEach{
+                player.sendMessage(MiniMessage.miniMessage().deserialize(it))
+            }
             return false
         }
+
         val levelData = beeHiveLevels[nextLevel]!!
         // requirements
         val requirements = requirementsController.getRequirements(levelData.combUpgradeRequirements)
-
-        var passed = true
-        requirements.forEach {
-            if(!it.check(player)){
-                passed = false
-                MagicBeesAPI.get()?.getTranslationsController()?.sendMessage(player, Messages.MISSING_REQUIREMENT, it.getName(), it.getType())
-            }
-        }
-        if(!passed) return false
 
         requirements.forEach {
             it.processRequirement(player)
@@ -206,6 +300,29 @@ class BeeHiveControllerImpl(
 
     override fun unloadChunk(chunk: ChunkLocation, world: String) {
         beeHiveStorage.unloadChunk(chunk, world)
+    }
+
+    override fun getBeeHiveItem(honeyLevel: Int, combLevel: Int): ItemStack {
+        val itemStack = ItemStack(Material.BEEHIVE)
+        val mm = MiniMessage.miniMessage()
+
+        val name = plugin.config.getString("beehive_template.name") ?: ""
+        val lore = plugin.config.getStringList("beehive_template.lore")
+
+        val meta = itemStack.itemMeta?.apply {
+            itemName(mm.deserialize(name.replace("{honey_level}", honeyLevel.toString()).replace("{comb_level}", combLevel.toString()))
+                .decorations(setOf(TextDecoration.ITALIC), false))
+            lore(lore.map { mm.deserialize(it.replace("{honey_level}", honeyLevel.toString()).replace("{comb_level}", combLevel.toString()))
+                .decorations(setOf(TextDecoration.ITALIC), false) })
+            addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+        }
+
+        itemStack.itemMeta = meta
+
+        NBTUtil.setNBTTag(itemStack, NBTUtil.COMB_LEVEL_KEY, PersistentDataType.INTEGER, combLevel)
+        NBTUtil.setNBTTag(itemStack, NBTUtil.HONEY_LEVEL_KEY, PersistentDataType.INTEGER, honeyLevel)
+
+        return itemStack
     }
 
 

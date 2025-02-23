@@ -1,7 +1,6 @@
 package eu.virtusdevelops.magicbees.plugin.listeners
 
 import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
-import eu.virtusdevelops.magicbees.api.models.Location
 import org.bukkit.Material
 import org.bukkit.entity.Bee
 import org.bukkit.event.EventHandler
@@ -24,10 +23,8 @@ class BeeInteractListener(private val beeHiveController: BeeHiveController) : Li
         val block = event.block
         if (block.type != Material.BEEHIVE) return
 
-        val blockLocation = event.block.location
-        val location = Location(blockLocation.blockX, blockLocation.blockY, blockLocation.blockZ, blockLocation.world.name)
 
-        val hive = beeHiveController.getBeehive(location) ?: return
+        val hive = beeHiveController.getBeehive(event.block.location) ?: return
 
         // do the check whatever thing to check if bee entered the hive (so hive now has more bees or something?)
 

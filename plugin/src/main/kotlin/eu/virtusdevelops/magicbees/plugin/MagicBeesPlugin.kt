@@ -61,16 +61,27 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
     private fun registerControllers(){
         storageController = StorageController(this)
+        storageController.init()
+
         translationsController = TranslationsControllerImpl()
+
         providersController = ProvidersControllerImpl(this)
+
         requirementsController = RequirementsControllerImpl()
+
+
+
         rewardsController = RewardsControllerImpl()
 
+
+
         beehiveController = BeeHiveControllerImpl(
+            this,
             FileStorage(this, "levels.yml"),
-            BeeHiveMysql(),
             requirementsController,
-            rewardsController
+            rewardsController,
+            storageController,
+            logger
         )
         beehiveController.initialize()
 

@@ -1,12 +1,16 @@
 package eu.virtusdevelops.magicbees.gui.guis
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
+import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
+import eu.virtusdevelops.magicbees.api.controllers.TranslationsController
 import eu.virtusdevelops.magicbees.api.models.BeeHive
 import eu.virtusdevelops.magicbees.api.models.Messages
+import eu.virtusdevelops.magicbees.api.models.Result
 import eu.virtusdevelops.magicbees.gui.GUI
 import eu.virtusdevelops.magicbees.gui.Icon
 import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound.sound
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
@@ -19,6 +23,8 @@ class BeeHiveMenu(
     private val beeHive: BeeHive
 ) : GUI(player, 36, MagicBeesAPI.get()!!.getTranslationsController().getString(Messages.BEE_HIVE_MENU_TITLE)) {
 
+    private val beeHiveController: BeeHiveController = MagicBeesAPI.get()!!.getBeeHiveController()
+    private val translationsController: TranslationsController = MagicBeesAPI.get()!!.getTranslationsController()
 
     init {
         setup()
@@ -64,10 +70,10 @@ class BeeHiveMenu(
         val meta = item.itemMeta
 
         // parse title
-        val title = MagicBeesAPI.get()!!.getTranslationsController().getComponent(Messages.BEE_HIVE_STATUS_ICON_TITLE)
+        val title = translationsController.getComponent(Messages.BEE_HIVE_STATUS_ICON_TITLE)
         meta.displayName(title)
         // parse lore
-        val lore = MagicBeesAPI.get()!!.getTranslationsController().getComponentList(
+        val lore = translationsController.getComponentList(
             Messages.BEE_HIVE_STATUS_ICON_LORE,
             beeHive.honeyUpgradeLevel.toString(),
             beeHive.honeyCombUpgradeLevel.toString(),
@@ -123,16 +129,47 @@ class BeeHiveMenu(
     // upgrade honey
 
     private fun upgradeHoneyIcon(): Icon {
-        val icon = Icon(upgradeHoneyItem(), 5) { player, icon ->
-            icon.setItemStack(upgradeHoneyItem())
+
+
+
+        val icon = Icon(upgradeHoneyItem(beeHiveController.canUpgradeHoneyLevel(player, beeHive)), 5) { player, icon ->
+            icon.setItemStack(upgradeHoneyItem(beeHiveController.canUpgradeHoneyLevel(player, beeHive)))
         }
         icon.addClickAction {
+            val result = beeHiveController.canUpgradeHoneyLevel(player, beeHive)
+
+
             it.playSound(sound(key("ui.button.click"), net.kyori.adventure.sound.Sound.Source.MASTER, 1f, 1.19f))
         }
         return icon
     }
 
-    private fun upgradeHoneyItem(): ItemStack {
+    private fun upgradeHoneyItem(result: Result<Boolean, List<String>>): ItemStack {
+        if(result is Result.Failure){
+            val item = ItemStack(Material.BARRIER)
+            val meta = item.itemMeta
+
+            meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_HONEY_UPGRADE_MENU_ICON))
+
+            val lore = mutableListOf<String>()
+            result.errors.forEach {
+                lore.add(translationsController.getString(Messages.BEE_HIVE_HONEY_UPGRADE_FAIL_REQUIREMENTS_TEMPLATE, it))
+            }
+            val loreComponents = translationsController
+                .getComponentList(
+                    Messages.BEE_HIVE_HONEY_LEVEL_UPGRADE_FAIL_LORE,
+                    lore.joinToString("\n")
+                )
+
+            meta.lore(loreComponents)
+
+            item.itemMeta = meta
+            return item
+        }else{
+
+        }
+
+
         return ItemStack(Material.STONE)
     }
 

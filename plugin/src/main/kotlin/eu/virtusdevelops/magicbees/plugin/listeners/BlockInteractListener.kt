@@ -1,7 +1,6 @@
 package eu.virtusdevelops.magicbees.plugin.listeners
 
 import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
-import eu.virtusdevelops.magicbees.api.models.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -15,9 +14,7 @@ class BlockInteractListener(private val beeHiveController: BeeHiveController) : 
         if(event.clickedBlock == null) return
         val blockLocation = event.clickedBlock?.location ?: return
 
-        val location = Location(blockLocation.blockX, blockLocation.blockY, blockLocation.blockZ, blockLocation.world.name)
-
-        val hive = beeHiveController.getBeehive(location) ?: return
+        val hive = beeHiveController.getBeehive(blockLocation) ?: return
 
         // process the click
 

@@ -14,22 +14,51 @@ class StorageController(private val plugin: JavaPlugin) {
     private lateinit var hikariDataSource: HikariDataSource
 
     fun init(){
-
-
+        setupDataSource()
 
         setupDaos()
         setupStorageControllers()
     }
 
 
-    fun setupDaos(){
+    fun setupDataSource(){
+        val config = plugin.config
 
-        beeHiveDao = BeeHiveMysql(hikariDataSource, plugin.logger)
+        when (config.getString("database.driver")!!.lowercase()){
+            "mysql" -> {
+                hikariDataSource = HikariDataSource().apply {
+                    jdbcUrl = "jdbc:mysql://${config.getString("database.host")}:${config.getInt("database.port")}/${config.getString("database.database")}"
+                    username = config.getString("database.username")
+                    password = config.getString("database.password")
+                    driverClassName = "com.mysql.jdbc.Driver"
+                }
+            }
+            "mariadb" -> {
+                hikariDataSource = HikariDataSource().apply {
+                    jdbcUrl = "jdbc:mariadb://${config.getString("database.host")}:${config.getInt("database.port")}/${config.getString("database.database")}"
+                    username = config.getString("database.username")
+                    password = config.getString("database.password")
+                    driverClassName = "org.mariadb.jdbc.Driver"
+                }
+            }
+            "h2" -> {
+                hikariDataSource = HikariDataSource().apply {
+                    jdbcUrl = "jdbc:h2:file:${plugin.dataFolder.absolutePath}/magicbees.db"
+                    driverClassName = "org.h2.Driver"
+                }
+            }
+            else -> throw IllegalArgumentException("Invalid database driver!")
+        }
+
 
     }
 
 
-    fun setupStorageControllers(){
+    private fun setupDaos(){
+        beeHiveDao = BeeHiveMysql(hikariDataSource, plugin.logger)
+    }
+
+    private fun setupStorageControllers(){
         beeHiveStorageController = BeeHiveStorageController(beeHiveDao, plugin.logger)
     }
 

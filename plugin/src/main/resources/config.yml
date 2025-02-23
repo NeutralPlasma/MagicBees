@@ -1,0 +1,18 @@
+
+database:
+  # can be H2, or Mysql/MariaDB
+  driver: "H2"
+
+  mysql:
+    database: ""
+    address: "127.0.0.1"
+    port: 3306
+    user: ""
+    password: ""
+    useSSL: false
+
+beehive_template:
+  name: "<gradient:light_purple:gold>Magic beehive</gradient>"
+  lore:
+    - "<gray>Honey level: {0}"
+    - "<gray>Comb level: {1}"
