@@ -14,9 +14,9 @@ class ChunkData<T : StoredItem>(
 
 
     fun addItem(item: T){
-        if(removedItems[item.getPosition()] != null){
+        /*if(removedItems[item.getPosition()] != null){
             removedItems.remove(item.getPosition())
-        }
+        }*/
         addedItems[item.getPosition()] = item
         items[item.getPosition()] = item
     }

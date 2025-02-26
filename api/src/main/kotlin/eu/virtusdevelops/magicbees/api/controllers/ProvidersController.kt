@@ -2,7 +2,7 @@ package eu.virtusdevelops.magicbees.api.controllers
 
 import eu.virtusdevelops.magicbees.api.Provider
 
-interface ProvidersController {
+interface ProvidersController : Controller {
 
 
 

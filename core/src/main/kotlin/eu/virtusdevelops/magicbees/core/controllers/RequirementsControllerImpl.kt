@@ -4,19 +4,29 @@ import eu.virtusdevelops.magicbees.api.controllers.RequirementsController
 import eu.virtusdevelops.magicbees.api.requirements.Requirement
 import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
 import eu.virtusdevelops.magicbees.core.requirements.*
+import java.util.logging.Logger
 
-class RequirementsControllerImpl: RequirementsController {
+class RequirementsControllerImpl(
+    private val logger: Logger
+): RequirementsController {
 
     private val requirementParsers: MutableMap<String, RequirementParser> = mutableMapOf()
 
-    init {
+
+    override fun init(): Boolean {
+        logger.info("Initializing requirements controller...")
         registerRequirementParser(ItemRequirementParser())
         registerRequirementParser(VaultRequirementParser())
         registerRequirementParser(VotingPluginRequirementParser())
         registerRequirementParser(ExperienceRequirementParser())
         registerRequirementParser(CoinsEngineRequirementParser())
+        registerRequirementParser(DurabilityRequirementParser())
+        return true
     }
 
+    override fun reload() {
+
+    }
 
     override fun registerRequirementParser(parser: RequirementParser) {
         requirementParsers[parser.getName()] = parser

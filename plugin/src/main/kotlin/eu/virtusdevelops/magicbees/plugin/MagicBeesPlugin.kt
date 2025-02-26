@@ -9,6 +9,10 @@ import eu.virtusdevelops.magicbees.core.storage.mysql.BeeHiveMysql
 import eu.virtusdevelops.magicbees.core.utils.NBTUtil
 import eu.virtusdevelops.magicbees.gui.GuiController
 import eu.virtusdevelops.magicbees.plugin.commands.CommandRegistry
+import eu.virtusdevelops.magicbees.plugin.listeners.BeeHiveBlockListener
+import eu.virtusdevelops.magicbees.plugin.listeners.BeeInteractListener
+import eu.virtusdevelops.magicbees.plugin.listeners.BlockInteractListener
+import eu.virtusdevelops.magicbees.plugin.listeners.ChunkListener
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bstats.bukkit.Metrics
@@ -22,6 +26,7 @@ import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.setting.ManagerSetting
+import kotlin.math.log
 
 class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
@@ -36,23 +41,25 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
     private lateinit var guiController: GuiController
 
+    private lateinit var blockInteractListener: BlockInteractListener
+
     override fun onEnable() {
         saveDefaultConfig()
         enableBStats()
 
         NBTUtil.load(this)
-        // todo: setup storage
-
         registerControllers()
         // setup API
         MagicBeesAPI.setImplementation(this)
-
+        // listeners
+        setupListeners()
         // commands
         registerCommands()
     }
 
     override fun onDisable() {
         // storage save all
+        storageController.shutdown()
         // unregister api
         MagicBeesAPI.unload()
         logger.info("Successfully disabled MagicBees!")
@@ -60,21 +67,16 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
 
 
     private fun registerControllers(){
-        storageController = StorageController(this)
+        storageController = StorageController(this, logger)
         storageController.init()
-
-        translationsController = TranslationsControllerImpl()
-
-        providersController = ProvidersControllerImpl(this)
-
-        requirementsController = RequirementsControllerImpl()
-
-
-
-        rewardsController = RewardsControllerImpl()
-
-
-
+        translationsController = TranslationsControllerImpl(logger, FileStorage(this, "translations.yml"))
+        translationsController.init()
+        providersController = ProvidersControllerImpl(this, logger)
+        providersController.init()
+        requirementsController = RequirementsControllerImpl(logger)
+        requirementsController.init()
+        rewardsController = RewardsControllerImpl(logger)
+        rewardsController.init()
         beehiveController = BeeHiveControllerImpl(
             this,
             FileStorage(this, "levels.yml"),
@@ -83,11 +85,21 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
             storageController,
             logger
         )
-        beehiveController.initialize()
-
+        beehiveController.init()
         guiController = GuiController(this)
         guiController.init()
+    }
 
+    private fun setupListeners(){
+        val pm = this.server.pluginManager
+
+        blockInteractListener = BlockInteractListener(this, beehiveController, translationsController)
+        blockInteractListener.load()
+
+        pm.registerEvents(BeeHiveBlockListener(logger, beehiveController, translationsController), this)
+        pm.registerEvents(BeeInteractListener(logger, beehiveController), this)
+        pm.registerEvents(blockInteractListener, this)
+        pm.registerEvents(ChunkListener(beehiveController), this)
     }
 
 
@@ -172,7 +184,14 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
     }
 
     override fun reload() {
-        providersController.getAll().forEach {  it.init() }
-        beehiveController.initialize()
+        // reload all controllers
+        storageController.reload()
+        translationsController.reload()
+        providersController.reload()
+        requirementsController.reload()
+        rewardsController.reload()
+        beehiveController.reload()
+        guiController.reload()
+        blockInteractListener.load()
     }
 }

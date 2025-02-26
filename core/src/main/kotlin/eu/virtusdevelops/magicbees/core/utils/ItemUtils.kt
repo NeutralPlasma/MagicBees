@@ -280,6 +280,24 @@ object ItemUtils {
         return count
     }
 
+
+    fun get(
+        inv: Inventory,
+        itemStack: ItemStack,
+        comparison: BiPredicate<ItemStack, ItemStack> = BiPredicate { obj: ItemStack, stack: ItemStack ->
+            obj.isSimilar(stack)
+        }
+
+    ): ItemStack? {
+        for (i in inv) {
+            if(i == null) continue
+            if (comparison.test(itemStack, i)) {
+                return i
+            }
+        }
+        return null
+    }
+
     /**
      * Counts the number of items of the given type in the given inventory
      * @param inv The inventory to count the items in

@@ -4,19 +4,26 @@ import eu.virtusdevelops.magicbees.api.controllers.RewardsController
 import eu.virtusdevelops.magicbees.api.rewards.Reward
 import eu.virtusdevelops.magicbees.api.rewards.RewardParser
 import eu.virtusdevelops.magicbees.core.rewards.*
+import java.util.logging.Logger
 
-class RewardsControllerImpl : RewardsController {
+class RewardsControllerImpl(
+    private val logger: Logger
+) : RewardsController {
 
     private val rewardParsers: MutableMap<String, RewardParser> = mutableMapOf()
 
 
-    init {
+    override fun init(): Boolean {
+        logger.info("Initializing rewards controller...")
         registerRewardParser(ItemRewardParser())
         registerRewardParser(ExperienceRewardParser())
         registerRewardParser(VaultRewardParser())
         registerRewardParser(VotingPluginRewardParser())
         registerRewardParser(CoinsEngineRewardParser())
+        return true
+    }
 
+    override fun reload() {
     }
 
     override fun registerRewardParser(parser: RewardParser) {

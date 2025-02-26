@@ -1,10 +1,11 @@
 package eu.virtusdevelops.magicbees.core.utils
 
+import org.bukkit.Bukkit
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import java.util.function.BiPredicate
 
-enum class ItemData(private val compare: BiPredicate<ItemStack, ItemStack>) {
+enum class ItemData(val compare: BiPredicate<ItemStack, ItemStack>) {
     /**
      * For comparing the durability of two items
      */
@@ -28,8 +29,8 @@ enum class ItemData(private val compare: BiPredicate<ItemStack, ItemStack>) {
      * For comparing the display name of two items
      */
     NAME(BiPredicate { a: ItemStack, b: ItemStack ->
-        if (a.hasItemMeta() != b.hasItemMeta()) {
-            return@BiPredicate false
+        if (!a.hasItemMeta() && !b.hasItemMeta()) {
+            return@BiPredicate true
         }
         if (!a.hasItemMeta()) {
             return@BiPredicate true
@@ -40,32 +41,33 @@ enum class ItemData(private val compare: BiPredicate<ItemStack, ItemStack>) {
         if (!a.itemMeta.hasDisplayName()) {
             return@BiPredicate true
         }
-        a.itemMeta.displayName() == b.itemMeta.displayName()
+        a.itemMeta.displayName()!!.equals(b.itemMeta.displayName())
     }),
 
     /**
      * For comparing the lore of two items
      */
     LORE(BiPredicate { a: ItemStack, b: ItemStack ->
-        if (a.hasItemMeta() != b.hasItemMeta()) {
-            return@BiPredicate false
-        }
-        if (!a.hasItemMeta()) {
+        if (!a.hasItemMeta() && !b.hasItemMeta()) {
             return@BiPredicate true
         }
+
         if (a.itemMeta.hasLore() != b.itemMeta.hasLore()) {
             return@BiPredicate false
         }
+
         if (!a.itemMeta.hasLore()) {
             return@BiPredicate true
         }
+
         val lore1 = a.itemMeta.lore()
         val lore2 = b.itemMeta.lore()
+
         if (lore1!!.size != lore2!!.size) {
             return@BiPredicate false
         }
         for (i in lore1.indices) {
-            if (lore1[i] != lore2[i]) {
+            if (!lore1[i].equals(lore2[i])) {
                 return@BiPredicate false
             }
         }
@@ -82,7 +84,7 @@ enum class ItemData(private val compare: BiPredicate<ItemStack, ItemStack>) {
             return@BiPredicate false
         }
         for (ench in enchants1.keys) {
-            if (enchants1[ench] != enchants2[ench]) {
+            if (!enchants1[ench]!!.equals(enchants2[ench])) {
                 return@BiPredicate false
             }
         }
@@ -92,7 +94,12 @@ enum class ItemData(private val compare: BiPredicate<ItemStack, ItemStack>) {
     /**
      * For comparing the types of two items
      */
-    TYPE(BiPredicate { a: ItemStack, b: ItemStack -> a.type == b.type });
+    TYPE(BiPredicate { a: ItemStack, b: ItemStack ->
+        if(a.type != b.type) {
+            return@BiPredicate false
+        }
+        a.type == b.type
+    });
 
     /**
      * Compares this trait on the two items

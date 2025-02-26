@@ -1,10 +1,17 @@
-honey:
+special_comb:
+  material: "HONEYCOMB"
+  lore:
+    - "<gray>To bos potreboval za nadgradnjo"
+  name: "<gold>Special comb"
+
+special_honey:
   material: "HONEY_BOTTLE"
   lore:
-    - "<gray>Tasty and delicious"
+    - "<gray>To bos potreboval za nadgradnjo"
+  name: "<gold>Special honey"
 
-honey_comb:
+conversion_item:
+  name: "<light_purple>★ <gradient:gold:light_purple>Magic honeycomb</gradient> <gold>★"
   material: "HONEYCOMB"
-
-glass_bottle:
-  material: "GLASS_BOTTLE"
+  lore:
+    - "<gray>Used to convert beehives into magical ones"

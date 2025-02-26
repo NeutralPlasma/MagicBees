@@ -16,3 +16,12 @@ beehive_template:
   lore:
     - "<gray>Honey level: {0}"
     - "<gray>Comb level: {1}"
+
+
+quick_comb_harvest_tool: SHEARS
+quick_honey_harvest_tool: GLASS_BOTTLE
+
+# check items.yml for this one
+conversion_item: conversion_item
+
+offline_beehive_update_interval: 40

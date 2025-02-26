@@ -3,7 +3,7 @@ package eu.virtusdevelops.magicbees.api.controllers
 import eu.virtusdevelops.magicbees.api.requirements.Requirement
 import eu.virtusdevelops.magicbees.api.requirements.RequirementParser
 
-interface RequirementsController {
+interface RequirementsController : Controller {
 
     fun getAllParsers(): Set<RequirementParser>
 

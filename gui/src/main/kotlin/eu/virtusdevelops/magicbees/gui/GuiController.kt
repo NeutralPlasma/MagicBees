@@ -1,19 +1,26 @@
 package eu.virtusdevelops.magicbees.gui
 
+import eu.virtusdevelops.magicbees.api.controllers.Controller
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.UUID
 
 class GuiController(
     private val plugin: JavaPlugin,
-) {
+) : Controller {
 
     private val players: MutableSet<UUID> = mutableSetOf()
     private lateinit var listener: GUIListener
 
-    fun init(){
+    override fun init(): Boolean{
         listener = GUIListener(plugin, this)
         plugin.server.pluginManager.registerEvents(listener, plugin)
+        return true
+    }
+
+    override fun reload() {
+        disable()
+        init()
     }
 
 

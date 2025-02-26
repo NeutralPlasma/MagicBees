@@ -32,17 +32,17 @@ data class BeeHive(
         id: UUID,
         location: HiveLocation,
         owner: UUID,
-        modifiedTime: Long,
-        fullnessStatus: Int,
-        bees: Int,
-        honeyUpgradeLevel: Int,
-        honeyCombUpgradeLevel: Int,
-        combCollectedTimes: Int,
-        honeyCollectedTimes: Int,
-        lastCollectionTime: Long,
-        createdTime: Long
+        modifiedTime: Long = 0,
+        fullnessStatus: Int = 0,
+        bees: Int = 0,
+        honeyUpgradeLevel: Int = 0,
+        honeyCombUpgradeLevel: Int = 0,
+        combCollectedTimes: Int = 0,
+        honeyCollectedTimes: Int = 0,
+        lastCollectionTime: Long = 0,
+        createdTime: Long = 0
     ) : this(id, location, owner, createdTime) {
-        this.modifiedTime = modifiedTime
+        this.modifiedTime = if (modifiedTime == 0L) createdTime else modifiedTime
         this.fullnessStatus = fullnessStatus
         this.bees = bees
         this.honeyUpgradeLevel = honeyUpgradeLevel
@@ -59,7 +59,7 @@ data class BeeHive(
     var combCollectedTimes: Int by Delegates.observable(0) { _, _, _ -> updated = true }
     var honeyCollectedTimes: Int by Delegates.observable(0) { _, _, _ -> updated = true }
     var lastCollectionTime: Long by Delegates.observable(0L) { _, _, _ -> updated = true }
-    var modifiedTime: Long by Delegates.observable(0L) { _, _, _ -> updated = true }
+    var modifiedTime: Long by Delegates.observable(createdTime) { _, _, _ -> updated = true }
 
 
     override fun getPosition(): Position {

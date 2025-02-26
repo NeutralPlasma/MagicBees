@@ -1,6 +1,9 @@
 package eu.virtusdevelops.magicbees.core.utils
 
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
+import org.bukkit.block.Beehive
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
@@ -11,13 +14,13 @@ class NBTUtil {
     companion object {
         lateinit var HONEY_LEVEL_KEY: NamespacedKey
         lateinit var COMB_LEVEL_KEY: NamespacedKey
+        lateinit var BEE_AMOUNT: NamespacedKey
 
 
         fun load(plugin: JavaPlugin){
-
             HONEY_LEVEL_KEY = NamespacedKey(plugin, "honey_level")
             COMB_LEVEL_KEY = NamespacedKey(plugin, "comb_level")
-
+            BEE_AMOUNT = NamespacedKey(plugin, "bee_amount")
         }
 
 
@@ -44,6 +47,15 @@ class NBTUtil {
 
             }
             item.itemMeta = meta
+        }
+
+
+        fun setHoneyLevel(block: Block, level: Int) {
+            val data = block.blockData
+            if(data is org.bukkit.block.data.type.Beehive ){
+                data.honeyLevel = level
+                block.blockData = data
+            }
         }
     }
 }

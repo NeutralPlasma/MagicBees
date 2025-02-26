@@ -14,7 +14,8 @@ class CommandRegistry(private val plugin: MagicBeesPlugin, private val manager: 
         HarvestCommand(),
         DebugCommand(),
         ReloadCommand(),
-        GiveCommand()
+        GiveCommand(),
+        ItemCommand()
     )
 
     init {

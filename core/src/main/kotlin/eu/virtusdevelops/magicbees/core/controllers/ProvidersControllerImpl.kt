@@ -6,12 +6,16 @@ import eu.virtusdevelops.magicbees.core.providers.*
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.logging.Logger
 
-class ProvidersControllerImpl(private val javaPlugin: JavaPlugin) : ProvidersController {
+class ProvidersControllerImpl(private val javaPlugin: JavaPlugin,
+    private val logger: Logger) : ProvidersController {
 
     private val providers: MutableMap<String, Provider<*>> = mutableMapOf()
 
-    init {
+
+    override fun init(): Boolean {
+        logger.info("Initializing providers controller...")
         registerProvider(ExperienceProvider())
         registerProvider(ItemDamageProvider())
         registerProvider(ItemProvider(FileStorage(javaPlugin, "items.yml"), javaPlugin.logger))
@@ -24,8 +28,18 @@ class ProvidersControllerImpl(private val javaPlugin: JavaPlugin) : ProvidersCon
             registerProvider(CoinsEngineProvider())
         if(pm.isPluginEnabled("Vault"))
             registerProvider(VaultProvider())
+
+        reload()
+
+        return true
     }
 
+    override fun reload() {
+        // reload default providers?
+        providers.forEach {
+            it.value.init()
+        }
+    }
 
     override fun registerProvider(provider: Provider<*>) {
         provider.init()

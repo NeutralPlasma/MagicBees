@@ -221,17 +221,15 @@ class BeeHiveMysql(
                 )
             ),
             owner = UUID.fromString(resultSet.getString("owner")),
-            createdTime = resultSet.getLong("created_at") // Assuming this is a `val`
-        ).apply {
-            // Set mutable properties (var fields)
-            fullnessStatus = resultSet.getInt("fullness_status")
-            bees = resultSet.getInt("bees")
-            honeyUpgradeLevel = resultSet.getInt("honey_upgrade_level")
-            honeyCombUpgradeLevel = resultSet.getInt("honey_comb_upgrade_level")
-            combCollectedTimes = resultSet.getInt("comb_collected_times")
-            honeyCollectedTimes = resultSet.getInt("honey_collected_times")
-            lastCollectionTime = resultSet.getLong("last_collected_time")
+            createdTime = resultSet.getLong("created_at"),
+            fullnessStatus = resultSet.getInt("fullness_status"),
+            bees = resultSet.getInt("bees"),
+            honeyUpgradeLevel = resultSet.getInt("honey_upgrade_level"),
+            honeyCombUpgradeLevel = resultSet.getInt("honey_comb_upgrade_level"),
+            combCollectedTimes = resultSet.getInt("comb_collected_times"),
+            honeyCollectedTimes = resultSet.getInt("honey_collected_times"),
+            lastCollectionTime = resultSet.getLong("last_collected_time"),
             modifiedTime = resultSet.getLong("updated_at")
-        }
+        )
     }
 }

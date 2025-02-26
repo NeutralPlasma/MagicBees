@@ -25,7 +25,11 @@ data class HiveLocation(
         val x = chunkLocation.x.shl(4) + position.x
         val z = chunkLocation.z.shl(4) + position.z
 
-        Location(world, x.toDouble(), position.z.toDouble(),  z.toDouble())
+        Location(world, x.toDouble(), position.y.toDouble(),  z.toDouble())
+    }
+
+    val block by lazy {
+        bukkitLocation.block
     }
 
 
@@ -36,7 +40,7 @@ data class HiveLocation(
             val worldName = location.world.name
             val chunkX = location.blockX.shr(4)
             val chunkZ = location.blockZ.shr(4)
-            val position = Position(location.blockX.rem(16), location.blockY, location.blockZ.rem(16))
+            val position = Position((location.blockX.rem(16) + 16) % 16, location.blockY, (location.blockZ.rem(16) + 16 )% 16)
 
             return HiveLocation(ChunkLocation(chunkX, chunkZ), position, worldName)
         }

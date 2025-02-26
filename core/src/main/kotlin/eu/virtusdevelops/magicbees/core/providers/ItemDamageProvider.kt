@@ -21,8 +21,10 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
 
     override fun give(player: Player, value: ItemStack, amount: Int): Boolean {
         val meta = value.itemMeta
+        if(meta.isUnbreakable) return true
         if(meta is Damageable){
-            meta.damage += amount
+            if(meta.damage + amount > value.type.maxDurability) return false
+            meta.damage -= amount
             value.itemMeta = meta
             return true
         }
@@ -35,11 +37,12 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
 
     override fun take(player: Player, value: ItemStack, amount: Int): Boolean {
         val meta = value.itemMeta
+        if(meta.isUnbreakable) return true
         if(meta is Damageable){
             // add checks for unbreaking enchant and unbreakable modifier
 
-            if(meta.damage < amount) return false
-            meta.damage -= amount
+            if(value.type.maxDurability - meta.damage < amount) return false
+            meta.damage += amount
             value.itemMeta = meta
             return true
         }
@@ -52,10 +55,10 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
 
     override fun has(player: Player, value: ItemStack, amount: Int): Boolean {
         val meta = value.itemMeta
+        if(meta.isUnbreakable) return true
         if(meta is Damageable){
             // add checks for unbreaking enchant and unbreakable modifier
-
-            return meta.damage >= amount
+            return value.type.maxDurability - meta.damage >= amount
         }
         return false
     }
@@ -66,8 +69,9 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
 
     override fun set(player: Player, value: ItemStack, amount: Int): Boolean {
         val meta = value.itemMeta
+        if(meta.isUnbreakable) return true
         if(meta is Damageable){
-            meta.damage = amount
+            meta.damage -= amount
             value.itemMeta = meta
             return true
         }

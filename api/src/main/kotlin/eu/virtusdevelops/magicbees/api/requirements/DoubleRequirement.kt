@@ -1,5 +1,6 @@
 package eu.virtusdevelops.magicbees.api.requirements
 
+import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.Provider
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -32,5 +33,6 @@ class DoubleRequirement (private val amount: Double,
 
     override fun getName(): String = "$amount"
 
-    override fun getType(): String = provider.getName()
+    override fun getType(): String =
+        MagicBeesAPI.get()?.getTranslationsController()?.getString(provider.getName().uppercase()) ?: provider.getName()
 }

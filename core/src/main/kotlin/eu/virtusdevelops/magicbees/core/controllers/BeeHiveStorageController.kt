@@ -1,24 +1,81 @@
 package eu.virtusdevelops.magicbees.core.controllers
 
+import eu.virtusdevelops.magicbees.api.controllers.Controller
 import eu.virtusdevelops.magicbees.api.models.BeeHive
 import eu.virtusdevelops.magicbees.api.models.ChunkLocation
 import eu.virtusdevelops.magicbees.api.models.HiveLocation
 import eu.virtusdevelops.magicbees.api.models.Position
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.ChunkData
+import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitTask
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Logger
 
 class BeeHiveStorageController(
+    private val javaPlugin: JavaPlugin,
     private val dao: BeeHiveDao,
     private val logger: Logger
-) {
+) : Controller{
     private var chunkData: HashMap<String, HashMap<ChunkLocation, ChunkData<BeeHive>>> = HashMap()
 
 
-    private val executorService: ExecutorService = Executors.newFixedThreadPool(2)
+    private lateinit var executorService: ExecutorService
+    private var savingSchedule: BukkitTask? = null
+
+
+    override fun init(): Boolean {
+        logger.info("Initializing beehive storage controller...")
+        executorService = Executors.newFixedThreadPool(2)
+
+        savingSchedule = Bukkit
+            .getScheduler()
+            .runTaskTimerAsynchronously(
+                javaPlugin,
+                Runnable { savingTask() },
+                0, 1200)
+
+        return true
+    }
+
+    override fun reload() {
+        logger.info("Reloading beehive storage controller...")
+
+        if(savingSchedule != null)
+            savingSchedule!!.cancel()
+
+        executorService.shutdown()
+        executorService = Executors.newFixedThreadPool(2)
+
+        savingSchedule = Bukkit
+            .getScheduler()
+            .runTaskTimerAsynchronously(
+                javaPlugin,
+                Runnable { savingTask() },
+                0, 1200)
+    }
+
+
+    fun shutdown(){
+        savingSchedule?.cancel()
+        for(world in chunkData.keys){
+            for(chunk in chunkData[world]!!.keys){
+                saveChunk(chunkData[world]!![chunk]!!)
+            }
+        }
+    }
+
+
+    fun savingTask(){
+        for(world in chunkData.keys){
+            for(chunk in chunkData[world]!!.keys){
+                saveChunkAsync(chunkData[world]!![chunk]!!)
+            }
+        }
+    }
 
     fun get(location: Location): BeeHive? {
         val hiveLocation = HiveLocation.fromBukkitLocation(location)
@@ -58,14 +115,21 @@ class BeeHiveStorageController(
 
         chunkData[location.worldName]!![location.chunkLocation]?.addItem(beeHive)
 
+
         return true
     }
 
 
 
-    fun loadChunkAsync(chunkLocation: ChunkLocation, world: String){
+    fun loadChunkAsync(chunkLocation: ChunkLocation, world: String, callback: CallBack? = null){
         executorService.submit {
             loadChunk(chunkLocation, world)
+            if (callback == null) return@submit
+
+            Bukkit.getScheduler().runTask(javaPlugin, (Runnable {
+                val data = chunkData[world]?.get(chunkLocation) ?: return@Runnable
+                callback.run(data)
+            }))
         }
     }
 
@@ -79,7 +143,7 @@ class BeeHiveStorageController(
         for(beehive in loadedData){
             hivesNew[beehive.location.position] = beehive
         }
-        val newChunkData = ChunkData<BeeHive>(chunkLocation, hivesNew)
+        val newChunkData = ChunkData(chunkLocation, hivesNew)
 
         if(!chunkData.containsKey(world)){
             chunkData[world] = HashMap()
@@ -126,4 +190,6 @@ class BeeHiveStorageController(
         }
 
     }
+
+
 }

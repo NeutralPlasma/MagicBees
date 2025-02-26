@@ -1,6 +1,7 @@
 package eu.virtusdevelops.magicbees.api.requirements
 
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
+import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -9,7 +10,6 @@ class AdvancedDoubleRequirement(
     private val key: String,
     private val amount: Double,
     private val provider: AdvancedProvider<String, Double>) : Requirement {
-
 
 
     override fun check(player: Player): Boolean {
@@ -30,5 +30,6 @@ class AdvancedDoubleRequirement(
 
     override fun getName(): String = "$amount"
 
-    override fun getType(): String = key
+    override fun getType(): String =
+        MagicBeesAPI.get()?.getTranslationsController()?.getString(key.uppercase()) ?: key
 }

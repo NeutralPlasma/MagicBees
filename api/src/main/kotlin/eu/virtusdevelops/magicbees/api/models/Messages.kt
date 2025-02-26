@@ -5,8 +5,15 @@ enum class Messages(val defaultMessage: MessageContent) {
     // Single-line messages
     HIVE_EMPTY(MessageContent.Single("<red>Beehive is empty")),
     MISSING_REQUIREMENT(MessageContent.Single("<red>You''re missing <gold>{0}<red> {1}")),
+    PASSED_REQUIREMENT(MessageContent.Single("<green>You have <gold>{0} <gold>{1}<green>")),
     SUCCESSFUL_HARVEST(MessageContent.Single("<green>You successfully harvested")),
     INVALID_PLAYER(MessageContent.Single("<red>Invalid player")),
+    INVALID_ITEM(MessageContent.Single("<red>Invalid item <gray>(<yellow>{0}<gray>)")),
+    NO_PERMISSION(MessageContent.Single("<red>You don't have permission to do that. <gray>(<yellow>{0}<gray>)")),
+    BEE_HIVE_PLACED(MessageContent.Single("<green>Magic beehive placed")),
+    BEE_HIVE_CONVERTED(MessageContent.Single("<green>Magic beehive converted")),
+    BEE_HIVE_BROKEN(MessageContent.Single("<green>Magic beehive broken")),
+    BEE_HIVE_MAX_LEVEL(MessageContent.Single("<red>You have reached the maximum level of this hive")),
 
     // GUI
     BEE_HIVE_MENU_TITLE(MessageContent.Single("<gold>Magic Beehive")),
@@ -23,11 +30,71 @@ enum class Messages(val defaultMessage: MessageContent) {
     ),
     BEE_HIVE_HONEY_UPGRADE_MENU_ICON(MessageContent.Single("<gold>Upgrade honey level")),
     BEE_HIVE_HONEY_LEVEL_UPGRADE_FAIL_LORE(MessageContent.Multiple(listOf(
-        "<red>Missing requirement:",
+        "<gradient:light_purple:gold>Missing requirement:</gradient>",
+        "{0}",
+        "<gradient:light_purple:gold>Passed requirements:</gradient>",
+        "{1}"
+    ))),
+    BEE_HIVE_HONEY_UPGRADE_FAIL_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <red>{0}")),
+    BEE_HIVE_HONEY_LEVEL_UPGRADE_LORE(MessageContent.Multiple(listOf(
+        "<gradient:light_purple:gold>Requirements:</gradient>",
         "{0}"
     ))),
-    BEE_HIVE_HONEY_UPGRADE_FAIL_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <red>{0}"));
+    BEE_HIVE_HONEY_UPGRADE_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <green>{0}")),
+    BEE_HIVE_HONEY_MAXED_LORE(MessageContent.Multiple(listOf(
+        "<red>You have reached the maximum honey level"
+    ))),
 
+
+
+    BEE_HIVE_COMB_UPGRADE_MENU_ICON(MessageContent.Single("<gold>Upgrade comb level")),
+    BEE_HIVE_COMB_LEVEL_UPGRADE_FAIL_LORE(MessageContent.Multiple(listOf(
+    "<gradient:light_purple:gold>Missing requirement:</gradient>",
+    "{0}",
+    "<gradient:light_purple:gold>Passed requirements:</gradient>",
+    "{1}"
+    ))),
+    BEE_HIVE_COMB_UPGRADE_FAIL_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <red>{0}")),
+    BEE_HIVE_COMB_LEVEL_UPGRADE_LORE(MessageContent.Multiple(listOf(
+    "<gradient:light_purple:gold>Requirements:</gradient>",
+    "{0}"
+    ))),
+    BEE_HIVE_COMB_UPGRADE_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <green>{0}")),
+    BEE_HIVE_COMB_MAXED_LORE(MessageContent.Multiple(listOf(
+        "<red>You have reached the maximum comb level"
+    ))),
+
+
+    BEE_HIVE_HONEY_HARVEST_MENU_ICON(MessageContent.Single("<gold>Harvest honey")),
+    BEE_HIVE_HONEY_HARVEST_FAIL_LORE(MessageContent.Multiple(listOf(
+        "<gradient:light_purple:gold>Missing requirement:</gradient>",
+        "{0}",
+        "<gradient:light_purple:gold>Passed requirements:</gradient>",
+        "{1}"
+    ))),
+    BEE_HIVE_HONEY_HARVEST_REQUIREMENTS_FAIL_TEMPLATE(MessageContent.Single("<gray>- <red>{0}")),
+    BEE_HIVE_HONEY_HARVEST_LORE(MessageContent.Multiple(listOf(
+        "<gradient:light_purple:gold>Requirements:</gradient>",
+        "{0}"
+    ))),
+    BEE_HIVE_HONEY_HARVEST_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <green>{0}")),
+
+
+    BEE_HIVE_COMB_HARVEST_MENU_ICON(MessageContent.Single("<gold>Harvest combs")),
+    BEE_HIVE_COMB_HARVEST_FAIL_LORE(MessageContent.Multiple(listOf(
+        "<gradient:light_purple:gold>Missing requirement:</gradient>",
+        "{0}",
+        "<gradient:light_purple:gold>Passed requirements:</gradient>",
+        "{1}"
+    ))),
+    BEE_HIVE_COMB_HARVEST_REQUIREMENTS_FAIL_TEMPLATE(MessageContent.Single("<gray>- <red>{0}")),
+    BEE_HIVE_COMB_HARVEST_LORE(MessageContent.Multiple(listOf(
+        "<gradient:light_purple:gold>Requirements:</gradient>",
+        "{0}"
+    ))),
+    BEE_HIVE_COMB_HARVEST_REQUIREMENTS_TEMPLATE(MessageContent.Single("<gray>- <green>{0}")),
+
+    ;
 
 
     // Utility methods for easy handling

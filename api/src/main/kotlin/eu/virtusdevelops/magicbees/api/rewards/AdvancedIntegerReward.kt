@@ -11,7 +11,7 @@ class AdvancedIntegerReward(
     private val provider: AdvancedProvider<String, Int>
 ) : Reward {
     override fun give(player: Player) {
-        val amount = Random.nextInt(min, max)
+        val amount = Random.nextInt(min, max+1)
         provider.give(player, itemName, amount)
     }
 }

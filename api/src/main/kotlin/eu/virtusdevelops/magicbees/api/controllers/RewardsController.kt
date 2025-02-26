@@ -3,7 +3,7 @@ package eu.virtusdevelops.magicbees.api.controllers
 import eu.virtusdevelops.magicbees.api.rewards.Reward
 import eu.virtusdevelops.magicbees.api.rewards.RewardParser
 
-interface RewardsController {
+interface RewardsController : Controller {
 
     fun getAllParsers(): Set<RewardParser>
 

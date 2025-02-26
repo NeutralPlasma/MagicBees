@@ -1,6 +1,7 @@
 package eu.virtusdevelops.magicbees.api.requirements
 
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
+import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -30,5 +31,6 @@ class AdvancedIntegerRequirement(
 
     override fun getName(): String = "$amount"
 
-    override fun getType(): String = key
+    override fun getType(): String =
+        MagicBeesAPI.get()?.getTranslationsController()?.getString(key.uppercase()) ?: key
 }
