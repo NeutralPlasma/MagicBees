@@ -11,6 +11,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Logger
@@ -20,7 +21,7 @@ class BeeHiveStorageController(
     private val dao: BeeHiveDao,
     private val logger: Logger
 ) : Controller{
-    private var chunkData: HashMap<String, HashMap<ChunkLocation, ChunkData<BeeHive>>> = HashMap()
+    private var chunkData: ConcurrentHashMap<String, ConcurrentHashMap<ChunkLocation, ChunkData<BeeHive>>> = ConcurrentHashMap()
 
 
     private lateinit var executorService: ExecutorService
@@ -69,13 +70,7 @@ class BeeHiveStorageController(
     }
 
 
-    fun savingTask(){
-        for(world in chunkData.keys){
-            for(chunk in chunkData[world]!!.keys){
-                saveChunkAsync(chunkData[world]!![chunk]!!)
-            }
-        }
-    }
+
 
     fun get(location: Location): BeeHive? {
         val hiveLocation = HiveLocation.fromBukkitLocation(location)
@@ -106,7 +101,7 @@ class BeeHiveStorageController(
         val location = beeHive.location
 
         if(!chunkData.containsKey(location.worldName)){
-            chunkData[location.worldName] = HashMap()
+            chunkData[location.worldName] = ConcurrentHashMap()
         }
 
         if(!chunkData[location.worldName]!!.containsKey(location.chunkLocation)){
@@ -146,7 +141,7 @@ class BeeHiveStorageController(
         val newChunkData = ChunkData(chunkLocation, hivesNew)
 
         if(!chunkData.containsKey(world)){
-            chunkData[world] = HashMap()
+            chunkData[world] = ConcurrentHashMap()
         }
 
         chunkData[world]!![chunkLocation] = newChunkData
@@ -192,4 +187,11 @@ class BeeHiveStorageController(
     }
 
 
+    private fun savingTask(){
+        for(world in chunkData.keys){
+            for(chunk in chunkData[world]!!.keys){
+                saveChunkAsync(chunkData[world]!![chunk]!!)
+            }
+        }
+    }
 }

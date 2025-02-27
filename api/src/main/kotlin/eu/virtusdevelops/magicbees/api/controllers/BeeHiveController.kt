@@ -1,15 +1,18 @@
 package eu.virtusdevelops.magicbees.api.controllers
 
-import eu.virtusdevelops.magicbees.api.models.BeeHive
-import eu.virtusdevelops.magicbees.api.models.ChunkLocation
-import eu.virtusdevelops.magicbees.api.models.ListResult
-import eu.virtusdevelops.magicbees.api.models.Result
+import eu.virtusdevelops.magicbees.api.models.*
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 interface BeeHiveController : Controller {
 
+    /**
+     * Saves the given beehive to persistent storage or updates its current state.
+     *
+     * @param beeHive The BeeHive instance to be saved or updated.
+     * @return True if the beehive was successfully saved or updated; false otherwise.
+     */
     fun saveBeeHive(beeHive: BeeHive): Boolean
 
     fun removeBeeHive(beeHive: BeeHive): Boolean
@@ -38,4 +41,7 @@ interface BeeHiveController : Controller {
 
     fun getBeeHiveItem(honeyLevel: Int, combLevel: Int, beeAmount: Int): ItemStack
 
+    fun getHoneyLevels(): Collection<BeeHiveLevel>
+
+    fun getCombLevels(): Collection<BeeHiveLevel>
 }

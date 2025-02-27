@@ -53,6 +53,8 @@ class ItemCommand : AbstractCommand {
 
         ItemUtils.give(target, item, amount)
 
+        ctx.source().sendMessage(translationsController.getComponent(Messages.ITEM_GIVEN, translationsController.getString(itemKey), target.name))
+        translationsController.sendMessage(target, Messages.ITEM_RECEIVED, translationsController.getString(itemKey))
 
     }
 

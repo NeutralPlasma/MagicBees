@@ -11,7 +11,6 @@ class CommandRegistry(private val plugin: MagicBeesPlugin, private val manager: 
 
     private val commands: List<AbstractCommand> = listOf(
         HelpCommand(),
-        HarvestCommand(),
         DebugCommand(),
         ReloadCommand(),
         GiveCommand(),

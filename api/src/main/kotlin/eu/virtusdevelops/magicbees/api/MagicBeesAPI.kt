@@ -1,6 +1,7 @@
 package eu.virtusdevelops.magicbees.api
 
 import eu.virtusdevelops.magicbees.api.controllers.*
+import eu.virtusdevelops.magicbees.api.models.Result
 import org.jetbrains.annotations.ApiStatus
 
 interface MagicBeesAPI {
@@ -48,7 +49,7 @@ interface MagicBeesAPI {
     }
 
 
-    fun reload()
+    fun reload(): Result<List<String>, List<String>>
 
     fun getBeeHiveController(): BeeHiveController
 

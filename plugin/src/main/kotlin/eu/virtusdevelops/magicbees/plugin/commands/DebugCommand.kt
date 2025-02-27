@@ -36,22 +36,36 @@ class DebugCommand : AbstractCommand {
             "providers" -> {
                 val providers = MagicBeesAPI.get()!!.getProvidersController().getAll()
                 source.sendMessage(mm.deserialize("<gradient:light_purple:gold>MagicBees Providers:</gradient>"))
-                for(provider in providers) {
-                    source.sendMessage(mm.deserialize("<gray>- <gold>${provider.getName()}"))
+
+                val last = providers.size - 1
+                providers.forEachIndexed { index, provider ->
+                    if(index == last)
+                        source.sendMessage(mm.deserialize("<gray>└─ <gold>${provider.getName()}"))
+                    else
+                        source.sendMessage(mm.deserialize("<gray>├─ <gold>${provider.getName()}"))
                 }
             }
             "reward_parsers" -> {
                 val parsers = MagicBeesAPI.get()!!.getRewardsController().getAllParsers()
                 source.sendMessage(mm.deserialize("<gradient:light_purple:gold>MagicBees reward parsers:</gradient>"))
-                for(parser in parsers) {
-                    source.sendMessage(mm.deserialize("<gray>- <gold>${parser.getName()}"))
+
+                val last = parsers.size - 1
+                parsers.forEachIndexed { index, parser ->
+                    if(index == last)
+                        source.sendMessage(mm.deserialize("<gray>└─ <gold>${parser.getName()}"))
+                    else
+                        source.sendMessage(mm.deserialize("<gray>├─ <gold>${parser.getName()}"))
                 }
             }
             "requirements_parsers" -> {
                 val parsers = MagicBeesAPI.get()!!.getRequirementsController().getAllParsers()
                 source.sendMessage(mm.deserialize("<gradient:light_purple:gold>MagicBees requirements parsers:</gradient>"))
-                for(parser in parsers) {
-                    source.sendMessage(mm.deserialize("<gray>- <gold>${parser.getName()}"))
+                val last = parsers.size - 1
+                parsers.forEachIndexed { index, parser ->
+                    if(index == last)
+                        source.sendMessage(mm.deserialize("<gray>└─ <gold>${parser.getName()}"))
+                    else
+                        source.sendMessage(mm.deserialize("<gray>├─ <gold>${parser.getName()}"))
                 }
             }
             else -> {

@@ -96,7 +96,7 @@ class BeeHiveMenu(
                 return@addClickAction
             }
             // success
-            beeHiveController.combBeeHive(player, beeHive)
+            beeHiveController.harvestBeeHive(player, beeHive)
             it.playSound(sound(key("block.beehive.drip"), net.kyori.adventure.sound.Sound.Source.MASTER, 1f, 1.19f))
             refresh()
         }

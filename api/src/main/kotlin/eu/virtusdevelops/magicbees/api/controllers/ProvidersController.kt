@@ -4,8 +4,6 @@ import eu.virtusdevelops.magicbees.api.Provider
 
 interface ProvidersController : Controller {
 
-
-
     fun registerProvider(provider: Provider<*>)
 
     fun unregisterProvider(provider: Provider<*>)

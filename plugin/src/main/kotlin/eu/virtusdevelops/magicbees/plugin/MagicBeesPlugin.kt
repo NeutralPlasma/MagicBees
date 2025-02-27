@@ -2,6 +2,7 @@ package eu.virtusdevelops.magicbees.plugin
 
 import eu.virtusdevelops.magicbees.api.MagicBeesAPI
 import eu.virtusdevelops.magicbees.api.controllers.*
+import eu.virtusdevelops.magicbees.api.models.Result
 import eu.virtusdevelops.magicbees.core.controllers.*
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
@@ -183,15 +184,48 @@ class MagicBeesPlugin : JavaPlugin(), MagicBeesAPI {
         return translationsController
     }
 
-    override fun reload() {
+    override fun reload() : Result<List<String>, List<String>> {
+        val result = mutableListOf<String>()
         // reload all controllers
+        var start = System.currentTimeMillis()
         storageController.reload()
+        var end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded StorageController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
         translationsController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded TranslationsController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         providersController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded ProvidersController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         requirementsController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded RequirementsController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         rewardsController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded RewardsController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         beehiveController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded BeehiveController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         guiController.reload()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded GuiController in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+
         blockInteractListener.load()
+        end = System.currentTimeMillis() - start
+        result.add("<green>Reloaded BlockInteractListener in <yellow>${end}<green>ms")
+        start = System.currentTimeMillis()
+        return Result.Success(result)
     }
 }

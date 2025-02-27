@@ -394,6 +394,13 @@ class BeeHiveControllerImpl(
         return itemStack
     }
 
+    override fun getHoneyLevels(): Collection<BeeHiveLevel> {
+        return combHiveLevels.values
+    }
+
+    override fun getCombLevels(): Collection<BeeHiveLevel> {
+        return beeHiveLevels.values
+    }
 
     fun parseLevel(data: ConfigurationSection): BeeHiveLevel? {
         try{

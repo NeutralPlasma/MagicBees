@@ -1,14 +1,21 @@
-
 database:
   # can be H2, or Mysql/MariaDB
+  # H2 is local database
+  # while MySQL and MariaDB require a separate database server
   driver: "H2"
 
   mysql:
+    # the name of the database
     database: ""
+    # connection address to the database server
     address: "127.0.0.1"
+    # port of the database server
     port: 3306
+    # user used to log in to the database
     user: ""
+    # password of the said user
     password: ""
+    # use SSL encrypted connection
     useSSL: false
 
 beehive_template:
@@ -17,11 +24,11 @@ beehive_template:
     - "<gray>Honey level: {0}"
     - "<gray>Comb level: {1}"
 
-
+# tool for quick harvesting (just r-click the beehive with the said tool)
 quick_comb_harvest_tool: SHEARS
+# same as above but for comb harvesting
 quick_honey_harvest_tool: GLASS_BOTTLE
 
 # check items.yml for this one
 conversion_item: conversion_item
-
 offline_beehive_update_interval: 40

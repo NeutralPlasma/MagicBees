@@ -1,3 +1,12 @@
+# providers information
+# Item:
+# template: "Item:<name from items.yml or !<material>:<amount>"
+# example
+# "Item:!stone:10"
+# if used in rewards you need to provider 2 numbers
+# template: "Item:<name from items.yml or !<material>:<min>:<max>"
+
+
 honey_levels:
   1:
     upgrade_requirements: []

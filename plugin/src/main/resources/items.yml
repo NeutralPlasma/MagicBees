@@ -1,13 +1,24 @@
+# template for item
+# <name>:
+#   material: <material>
+#   lore:  # optional
+#     - ""
+#     - ""
+#   name: <name> # optional
+#   modelId: <id> # optional
+#
+# item can also be provided in base64 format
+
 special_comb:
   material: "HONEYCOMB"
   lore:
-    - "<gray>To bos potreboval za nadgradnjo"
+    - "<gray>Used to upgrade beehive"
   name: "<gold>Special comb"
 
 special_honey:
   material: "HONEY_BOTTLE"
   lore:
-    - "<gray>To bos potreboval za nadgradnjo"
+    - "<gray>Used to upgrade beehive"
   name: "<gold>Special honey"
 
 conversion_item:
