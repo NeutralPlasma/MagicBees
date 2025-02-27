@@ -61,6 +61,7 @@ tasks {
         archiveClassifier.set("")
         archiveBaseName.set("MagicBees")
         //dependsOn(":api:shadowJar")
+        relocate("org.bstats", "eu.virtusdevelops.magicbees.libs.bstats")
     }
 
     build {

@@ -1,3 +1,4 @@
+metrics: true
 database:
   # can be H2, or Mysql/MariaDB
   # H2 is local database
