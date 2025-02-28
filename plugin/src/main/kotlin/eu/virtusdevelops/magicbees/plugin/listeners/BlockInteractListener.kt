@@ -61,6 +61,7 @@ class BlockInteractListener(
         if(hive == null && material != Material.AIR){
 
             if(item?.isSimilar(conversionItem) == true){
+                event.isCancelled = true
 
                 if(!event.player.hasPermission("magicbees.beehive.convert")){
                     translationsController.sendMessage(event.player, Messages.NO_PERMISSION, "magicbees.beehive.convert")

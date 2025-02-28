@@ -38,6 +38,7 @@ val authorsList = listOf("VirtusDevelops")
 bukkit {
     name = "MagicBees"
     main = "eu.virtusdevelops.magicbees.plugin.MagicBeesPlugin"
+    version = project.version.toString()
     apiVersion = "1.21"
     foliaSupported = false
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP

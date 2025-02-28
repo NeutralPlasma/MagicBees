@@ -19,6 +19,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 class BeeHiveMenu(
     private val player: Player,
@@ -67,15 +69,112 @@ class BeeHiveMenu(
         // parse title
         val title = translationsController.getComponent(Messages.BEE_HIVE_STATUS_ICON_TITLE)
         meta.displayName(title)
+
+        val honeyRewards = beeHiveController.getHarvestRewards(beeHive.honeyUpgradeLevel)
+        val combRewards = beeHiveController.getCombRewards(beeHive.honeyCombUpgradeLevel)
+
         // parse lore
-        val lore = translationsController.getComponentList(
-            Messages.BEE_HIVE_STATUS_ICON_LORE,
-            beeHive.honeyUpgradeLevel.toString(),
-            beeHive.honeyCombUpgradeLevel.toString(),
-            beeHive.bees.toString(),
-            beeHive.fullnessStatus.toString()
-        )
-        meta.lore(lore)
+        val loreComponents = mutableListOf<Component>()
+        val loreTemplate = translationsController
+            .getStringList(
+                Messages.BEE_HIVE_STATUS_ICON_LORE
+            )
+
+        val regex = Regex("\\{\\d+}")
+
+        val formatter = DecimalFormat("0.##")
+        loreTemplate.forEach { line ->
+            val data = regex.find(line)
+            if(data != null){
+                when(data.value){
+                    "{0}" -> {
+                        loreComponents.add(
+                            MiniMessage.miniMessage().deserialize(line.replace(data.value, beeHive.honeyUpgradeLevel.toString()))
+                                .decorations(setOf(TextDecoration.ITALIC), false)
+                        )
+                    }
+                    "{1}" -> {
+                        loreComponents.add(
+                            MiniMessage.miniMessage().deserialize(line.replace(data.value, beeHive.honeyCombUpgradeLevel.toString()))
+                                .decorations(setOf(TextDecoration.ITALIC), false)
+                        )
+                    }
+                    "{2}" -> {
+                        loreComponents.add(
+                            MiniMessage.miniMessage().deserialize(line.replace(data.value, beeHive.bees.toString()))
+                                .decorations(setOf(TextDecoration.ITALIC), false)
+                        )
+                    }
+                    "{3}" -> {
+                        loreComponents.add(
+                            MiniMessage.miniMessage().deserialize(line.replace(data.value, beeHive.fullnessStatus.toString()))
+                                .decorations(setOf(TextDecoration.ITALIC), false)
+                        )
+                    }
+                    "{4}" -> {
+                        if(honeyRewards is Result.Success){
+                            honeyRewards.value.forEach { reward ->
+                                val min = formatter.format(reward.getMin())
+                                val max = formatter.format(reward.getMax())
+                                if(min == max){
+                                    loreComponents.add(
+                                        translationsController
+                                            .getComponent(Messages.BEE_HIVE_REWARD_TEMPLATE_SAME,
+                                                reward.getName(),
+                                                min,
+                                            )
+                                    )
+                                }else{
+                                    loreComponents.add(
+                                        translationsController
+                                            .getComponent(Messages.BEE_HIVE_REWARD_TEMPLATE,
+                                                reward.getName(),
+                                                min,
+                                                max
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    "{5}" -> {
+                        if(combRewards is Result.Success){
+                            combRewards.value.forEach { reward ->
+                                val min = formatter.format(reward.getMin())
+                                val max = formatter.format(reward.getMax())
+                                if(min == max){
+                                    loreComponents.add(
+                                        translationsController
+                                            .getComponent(Messages.BEE_HIVE_REWARD_TEMPLATE_SAME,
+                                                reward.getName(),
+                                                min,
+                                            )
+                                    )
+                                }else{
+                                    loreComponents.add(
+                                        translationsController
+                                            .getComponent(Messages.BEE_HIVE_REWARD_TEMPLATE,
+                                                reward.getName(),
+                                                min,
+                                                max
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        loreComponents.add(MiniMessage.miniMessage().deserialize(line).decorations(setOf(TextDecoration.ITALIC), false))
+                    }
+                }
+            }else  {
+                loreComponents.add(MiniMessage.miniMessage().deserialize(line).decorations(setOf(TextDecoration.ITALIC), false))
+            }
+
+        }
+
+
+        meta.lore(loreComponents)
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
         item.itemMeta = meta
         return item
@@ -105,7 +204,7 @@ class BeeHiveMenu(
 
     private fun harvestHoneyItem(result: Result<List<String>, ListResult<String, String>>): ItemStack {
         if(result is Result.Failure){
-            val item = ItemStack(Material.BARRIER)
+            val item = ItemStack(Material.TRIAL_KEY)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_HONEY_HARVEST_MENU_ICON))
             val loreComponents = mutableListOf<Component>()
@@ -179,7 +278,7 @@ class BeeHiveMenu(
     private fun harvestCombItem(result: Result<List<String>, ListResult<String, String>>): ItemStack {
 
         if(result is Result.Failure){
-            val item = ItemStack(Material.BARRIER)
+            val item = ItemStack(Material.TRIAL_KEY)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_COMB_HARVEST_MENU_ICON))
             val loreComponents = mutableListOf<Component>()
@@ -250,7 +349,7 @@ class BeeHiveMenu(
 
     private fun upgradeHoneyItem(result: Result<List<String>, ListResult<String, String>>): ItemStack {
         if(result is Result.Failure){
-            val item = ItemStack(Material.BARRIER)
+            val item = ItemStack(Material.OMINOUS_TRIAL_KEY)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_HONEY_UPGRADE_MENU_ICON))
             val loreComponents = mutableListOf<Component>()
@@ -275,7 +374,7 @@ class BeeHiveMenu(
             item.itemMeta = meta
             return item
         }else if(result is Result.Success){
-            val item = ItemStack(Material.EXPERIENCE_BOTTLE)
+            val item = ItemStack(Material.HONEY_BOTTLE)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_HONEY_UPGRADE_MENU_ICON))
             val loreComponents = mutableListOf<Component>()
@@ -338,7 +437,7 @@ class BeeHiveMenu(
 
     private fun upgradeCombItem(result: Result<List<String>, ListResult<String, String>>): ItemStack {
         if(result is Result.Failure){
-            val item = ItemStack(Material.BARRIER)
+            val item = ItemStack(Material.OMINOUS_TRIAL_KEY)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_COMB_UPGRADE_MENU_ICON))
             val loreComponents = mutableListOf<Component>()
@@ -363,7 +462,7 @@ class BeeHiveMenu(
             item.itemMeta = meta
             return item
         }else if(result is Result.Success){
-            val item = ItemStack(Material.EXPERIENCE_BOTTLE)
+            val item = ItemStack(Material.HONEYCOMB)
             val meta = item.itemMeta
             meta.displayName(translationsController.getComponent(Messages.BEE_HIVE_COMB_UPGRADE_MENU_ICON))
             val loreComponents = mutableListOf<Component>()

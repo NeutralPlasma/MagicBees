@@ -9,6 +9,10 @@
 #
 # item can also be provided in base64 format
 
+
+# you can later use those in rewards and requirements
+# Item:<name>:<amount> // requirement
+# Item:<name>:<min>:<max> // reward
 special_comb:
   material: "HONEYCOMB"
   lore:
@@ -25,4 +29,5 @@ conversion_item:
   name: "<light_purple>★ <gradient:gold:light_purple>Magic honeycomb</gradient> <gold>★"
   material: "HONEYCOMB"
   lore:
+    - "  <gray><strikethrough>                 </strikethrough>  "
     - "<gray>Used to convert beehives into magical ones"

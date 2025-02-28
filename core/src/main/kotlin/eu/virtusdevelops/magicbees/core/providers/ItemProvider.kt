@@ -1,5 +1,6 @@
 package eu.virtusdevelops.magicbees.core.providers
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
 import eu.virtusdevelops.magicbees.core.utils.ItemData
@@ -9,10 +10,16 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import java.net.MalformedURLException
+import java.net.URI
+import java.util.*
 import java.util.function.BiPredicate
 import java.util.logging.Logger
+import kotlin.collections.HashMap
 
 class ItemProvider(private val fileStorage: FileStorage, private val logger: Logger) : AdvancedProvider<String, Int> {
     private var items: HashMap<String, ItemStack> = HashMap()
@@ -147,8 +154,36 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
             })
         }
 
+        // check for head value
+        section.getString("head")?.let {
+            if(material == Material.PLAYER_HEAD && meta is org.bukkit.inventory.meta.SkullMeta){
+                val profile = getPlayerProfile(it)
+                meta.playerProfile = profile
+            }
+        }
+        section.getBoolean("glow").let {
+            if(it){
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+            }
+        }
+
         item.itemMeta = meta
         return item
+    }
+
+
+    private fun getPlayerProfile(headTexture: String): PlayerProfile {
+        val profile = Bukkit.createProfile(UUID.randomUUID())
+        val textures = profile.textures
+        try{
+            textures.skin = URI.create("https://textures.minecraft.net/texture/$headTexture").toURL()
+            profile.setTextures(textures)
+            return profile
+        }catch (exception: MalformedURLException){
+            exception.printStackTrace()
+            return profile
+        }
     }
 
     private val matcher = object: BiPredicate<ItemStack, ItemStack> {

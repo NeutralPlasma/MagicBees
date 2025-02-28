@@ -1,6 +1,7 @@
 package eu.virtusdevelops.magicbees.api.controllers
 
 import eu.virtusdevelops.magicbees.api.models.*
+import eu.virtusdevelops.magicbees.api.rewards.Reward
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -44,4 +45,8 @@ interface BeeHiveController : Controller {
     fun getHoneyLevels(): Collection<BeeHiveLevel>
 
     fun getCombLevels(): Collection<BeeHiveLevel>
+
+    fun getHarvestRewards(level: Int): Result<Collection<Reward>, List<String>>
+
+    fun getCombRewards(level: Int): Result<Collection<Reward>, List<String>>
 }

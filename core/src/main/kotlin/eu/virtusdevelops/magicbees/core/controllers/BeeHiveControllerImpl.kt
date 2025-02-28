@@ -5,6 +5,7 @@ import eu.virtusdevelops.magicbees.api.controllers.BeeHiveController
 import eu.virtusdevelops.magicbees.api.controllers.RequirementsController
 import eu.virtusdevelops.magicbees.api.controllers.RewardsController
 import eu.virtusdevelops.magicbees.api.models.*
+import eu.virtusdevelops.magicbees.api.rewards.Reward
 import eu.virtusdevelops.magicbees.core.storage.BeeHiveDao
 import eu.virtusdevelops.magicbees.core.storage.ChunkData
 import eu.virtusdevelops.magicbees.core.storage.FileStorage
@@ -400,6 +401,18 @@ class BeeHiveControllerImpl(
 
     override fun getCombLevels(): Collection<BeeHiveLevel> {
         return beeHiveLevels.values
+    }
+
+    override fun getHarvestRewards(level: Int): Result<Collection<Reward>, List<String>> {
+        val levelData = beeHiveLevels[level] ?: return Result.failure(listOf("Missing configuration for honey level $level!"))
+        val rewards = rewardsController.getRewards(levelData.harvestRewards)
+        return Result.success(rewards)
+    }
+
+    override fun getCombRewards(level: Int): Result<Collection<Reward>, List<String>> {
+        val levelData = combHiveLevels[level] ?: return Result.failure(listOf("Missing configuration for comb level $level!"))
+        val rewards = rewardsController.getRewards(levelData.harvestRewards)
+        return Result.success(rewards)
     }
 
     fun parseLevel(data: ConfigurationSection): BeeHiveLevel? {

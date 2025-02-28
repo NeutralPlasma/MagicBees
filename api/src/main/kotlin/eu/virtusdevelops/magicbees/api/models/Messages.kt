@@ -29,12 +29,20 @@ enum class Messages(val defaultMessage: MessageContent) {
         MessageContent.Multiple(
             listOf(
                 "<gray>Honey upgrade level: <gold>{0}",
+                "",
+                "{4}",
+                "",
                 "<gray>Comb upgrade level: <gold>{1}",
+                "",
+                "{5}",
+                "",
                 "<gray>Bees: <gold>{2}",
                 "<gray>Fullness: <gold>{3}"
             )
         )
     ),
+    BEE_HIVE_REWARD_TEMPLATE_SAME(MessageContent.Single("<gray>- <green>{0} <gray>(<yellow>{1}<gray>)")),
+    BEE_HIVE_REWARD_TEMPLATE(MessageContent.Single("<gray>- <green>{0} <gray>(<yellow>{1}<gray>, <yellow>{2}<gray>)")),
     BEE_HIVE_HONEY_UPGRADE_MENU_ICON(MessageContent.Single("<gold>Upgrade honey level")),
     BEE_HIVE_HONEY_LEVEL_UPGRADE_FAIL_LORE(MessageContent.Multiple(listOf(
         "<gradient:light_purple:gold>Missing requirement:</gradient>",
