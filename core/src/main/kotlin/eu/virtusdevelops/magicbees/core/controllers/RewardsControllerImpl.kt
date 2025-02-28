@@ -20,6 +20,7 @@ class RewardsControllerImpl(
         registerRewardParser(VaultRewardParser())
         registerRewardParser(VotingPluginRewardParser())
         registerRewardParser(CoinsEngineRewardParser())
+        registerRewardParser(CommandRewardParser())
         return true
     }
 
