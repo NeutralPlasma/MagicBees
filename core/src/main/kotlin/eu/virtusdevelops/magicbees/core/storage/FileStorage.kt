@@ -36,7 +36,7 @@ class FileStorage(private val javaPlugin: JavaPlugin, val filePath: String) {
 
     fun saveData(){
         val file = File(javaPlugin.dataFolder, filePath)
-        if(!file.exists()){
+        if(file.exists()){
             try{
                 configuration!!.save(file)
             }catch (e: IOException){

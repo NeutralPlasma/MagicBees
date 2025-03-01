@@ -15,9 +15,9 @@ class BasicCommandReward(
 
     override fun give(player: Player) {
         val random = (min..max).random()
-        val commandsender = Bukkit.getConsoleSender()
+        val commandSender = Bukkit.getConsoleSender()
         val actualCommand = command.replace("%player%", player.name).replace("%amount%", random.toString())
-        Bukkit.dispatchCommand(commandsender, actualCommand)
+        Bukkit.dispatchCommand(commandSender, actualCommand)
     }
 
     override fun getName(): String {

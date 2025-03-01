@@ -51,6 +51,7 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
 
             }
         }
+        fileStorage.saveData()
 
         initialized = true
     }
@@ -157,8 +158,11 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
         // check for head value
         section.getString("head")?.let {
             if(material == Material.PLAYER_HEAD && meta is org.bukkit.inventory.meta.SkullMeta){
-                val profile = getPlayerProfile(it)
+                val profile = getPlayerProfile(it, section.getString("uuid")?.let { UUID.fromString(it) })
                 meta.playerProfile = profile
+
+                section.set("uuid", profile.id?.toString() ?: "null")
+                logger.info("Setting uuid ${profile.id} for player head.")
             }
         }
         section.getBoolean("glow").let {
@@ -173,8 +177,12 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
     }
 
 
-    private fun getPlayerProfile(headTexture: String): PlayerProfile {
-        val profile = Bukkit.createProfile(UUID.randomUUID())
+    private fun getPlayerProfile(headTexture: String, uuid: UUID? = null): PlayerProfile {
+        var newUUID = uuid
+        if(newUUID == null)
+            newUUID = UUID.randomUUID()
+
+        val profile = Bukkit.createProfile(newUUID!!)
         val textures = profile.textures
         try{
             textures.skin = URI.create("https://textures.minecraft.net/texture/$headTexture").toURL()
