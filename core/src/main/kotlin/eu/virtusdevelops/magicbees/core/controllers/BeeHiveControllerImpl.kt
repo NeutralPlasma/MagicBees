@@ -379,10 +379,20 @@ class BeeHiveControllerImpl(
         val lore = plugin.config.getStringList("beehive_template.lore")
 
         val meta = itemStack.itemMeta?.apply {
-            itemName(mm.deserialize(name.replace("{honey_level}", honeyLevel.toString()).replace("{comb_level}", combLevel.toString()))
+            itemName(mm.deserialize(
+                name.replace("{honey_level}", honeyLevel.toString())
+                    .replace("{comb_level}", combLevel.toString())
+                    .replace("{bee_count}", beeAmount.toString())
+                )
                 .decorations(setOf(TextDecoration.ITALIC), false))
-            lore(lore.map { mm.deserialize(it.replace("{honey_level}", honeyLevel.toString()).replace("{comb_level}", combLevel.toString()))
-                .decorations(setOf(TextDecoration.ITALIC), false) })
+            lore(lore.map { mm.deserialize(
+                it.replace("{honey_level}", honeyLevel.toString())
+                    .replace("{comb_level}", combLevel.toString())
+                    .replace("{bee_count}", beeAmount.toString())
+                )
+                .decorations(setOf(TextDecoration.ITALIC), false) }
+            )
+
             addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
         }
 

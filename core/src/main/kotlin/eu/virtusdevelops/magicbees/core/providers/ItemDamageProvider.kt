@@ -1,6 +1,7 @@
 package eu.virtusdevelops.magicbees.core.providers
 
 import eu.virtusdevelops.magicbees.api.AdvancedProvider
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
@@ -40,9 +41,16 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
         if(meta.isUnbreakable) return true
         if(meta is Damageable){
             // add checks for unbreaking enchant and unbreakable modifier
+            var chance = 1.0
+            meta.enchants.forEach { (enchant, level) ->
+                if(enchant == Enchantment.UNBREAKING){
+                    chance = (100.0/level + 1.0)
+                }
+            }
+            val random  = (0..100).random()
 
             if(value.type.maxDurability - meta.damage < amount) return false
-            meta.damage += amount
+            meta.damage += if (random <= chance) amount else 0
             value.itemMeta = meta
             return true
         }
