@@ -117,7 +117,7 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
 
 
     fun getPlayerItem(player: Player, value: String): ItemStack?{
-        ItemUtils.get(player.inventory, getItem(value) ?: return null, matcher)?.let {
+        ItemUtils.get(player, getItem(value) ?: return null, matcher)?.let {
             return it
         }
         return null

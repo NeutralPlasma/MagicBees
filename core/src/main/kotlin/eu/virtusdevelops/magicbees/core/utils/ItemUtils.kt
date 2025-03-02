@@ -298,6 +298,28 @@ object ItemUtils {
         return null
     }
 
+    fun get(
+        player: Player,
+        itemStack: ItemStack,
+        comparison: BiPredicate<ItemStack, ItemStack> = BiPredicate { obj: ItemStack, stack: ItemStack ->
+            obj.isSimilar(stack)
+        }
+    ): ItemStack? {
+        val inv = player.inventory
+        val itemInHand = player.inventory.itemInMainHand
+        if(comparison.test(itemStack, itemInHand)) return itemInHand
+        val itemInOffHand = player.inventory.itemInOffHand
+        if(comparison.test(itemStack, itemInOffHand)) return itemInOffHand
+
+        for (i in inv) {
+            if(i == null) continue
+            if (comparison.test(itemStack, i) && i.amount > 0) {
+                return i
+            }
+        }
+        return null
+    }
+
     /**
      * Counts the number of items of the given type in the given inventory
      * @param inv The inventory to count the items in
