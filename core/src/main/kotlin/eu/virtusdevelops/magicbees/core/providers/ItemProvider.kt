@@ -77,11 +77,11 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
 
 
     override fun take(player: Player, value: String, amount: Int): Boolean {
-        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false, matcher)
+        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false, matcherAll)
         if(count < amount){
             return false
         }
-        ItemUtils.remove(player.inventory, getItem(value) ?: return false, amount, matcher)
+        ItemUtils.remove(player.inventory, getItem(value) ?: return false, amount, matcherAll)
 
         return true
     }
@@ -91,9 +91,14 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
     }
 
 
-    override fun has(player: Player, value: String, amount: Int): Boolean {
+    fun has(player: Player, value: String, amount: Int, ignoreEnchants: Boolean, ignoreLore: Boolean): Boolean{
+        val matcher = getMatcher(ignoreEnchants, ignoreLore)
         val count = ItemUtils.count(player.inventory, getItem(value) ?: return false, matcher)
         return count >= amount
+    }
+
+    override fun has(player: Player, value: String, amount: Int): Boolean {
+        return has(player, value, amount, false, false)
     }
 
     override fun has(player: Player, value: String): Boolean {
@@ -102,11 +107,11 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
 
 
     override fun set(player: Player, value: String, amount: Int): Boolean {
-        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false, matcher)
+        val count = ItemUtils.count(player.inventory, getItem(value) ?: return false, matcherAll)
         if(count < amount){
             ItemUtils.give(player, getItem(value) ?: return false, amount - count)
         }else if(count > amount){
-            ItemUtils.remove(player.inventory, getItem(value) ?: return false, count - amount, matcher)
+            ItemUtils.remove(player.inventory, getItem(value) ?: return false, count - amount, matcherAll)
         }
         return true
     }
@@ -117,11 +122,17 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
 
 
     fun getPlayerItem(player: Player, value: String): ItemStack?{
+        return getPlayerItem(player, value, false, false)
+    }
+
+    fun getPlayerItem(player: Player, value: String, ignoreEnchants: Boolean, ignoreLore: Boolean): ItemStack?{
+        val matcher = getMatcher(ignoreEnchants, ignoreLore)
         ItemUtils.get(player, getItem(value) ?: return null, matcher)?.let {
             return it
         }
         return null
     }
+
 
     fun getItem(value: String): ItemStack? {
         if(value.startsWith("!")){
@@ -194,7 +205,35 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
         }
     }
 
-    private val matcher = object: BiPredicate<ItemStack, ItemStack> {
+    private fun getMatcher(ignoreEnchants: Boolean, ignoreLore: Boolean): BiPredicate<ItemStack, ItemStack> {
+        Bukkit.getConsoleSender().sendMessage("Info: $ignoreEnchants, $ignoreLore")
+        if(!ignoreEnchants && !ignoreLore)
+             return matcherAll
+        if(ignoreEnchants && !ignoreLore)
+            return matcherLore
+
+        Bukkit.getConsoleSender().sendMessage("Lore and enchants are ignored.")
+
+        return matcherAny
+    }
+
+    private val matcherAny = object: BiPredicate<ItemStack, ItemStack> {
+        override fun test(t: ItemStack, u: ItemStack): Boolean {
+            return ItemData.TYPE.compare(t, u)
+                    //&& ItemData.NAME.compare(t, u)
+        }
+    }
+
+    private val matcherLore = object: BiPredicate<ItemStack, ItemStack> {
+        override fun test(t: ItemStack, u: ItemStack): Boolean {
+            return ItemData.TYPE.compare(t, u)
+                    && ItemData.NAME.compare(t, u)
+                    && ItemData.LORE.compare(t, u)
+        }
+    }
+
+
+    private val matcherAll = object: BiPredicate<ItemStack, ItemStack> {
         override fun test(t: ItemStack, u: ItemStack): Boolean {
             return ItemData.TYPE.compare(t, u)
                     && ItemData.NAME.compare(t, u)

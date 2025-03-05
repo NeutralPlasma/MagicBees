@@ -41,7 +41,7 @@ class ItemDamageProvider : AdvancedProvider<ItemStack, Int> {
         if(meta.isUnbreakable) return true
         if(meta is Damageable){
             // add checks for unbreaking enchant and unbreakable modifier
-            var chance = 1.0
+            var chance = 100.0
             meta.enchants.forEach { (enchant, level) ->
                 if(enchant == Enchantment.UNBREAKING){
                     chance = (100.0/level + 1.0)

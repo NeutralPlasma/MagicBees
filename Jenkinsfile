@@ -37,7 +37,7 @@ pipeline {
 
 	post {
 		always {
-			archiveArtifacts artifacts: '**/plugin/build/libs/MagicBees.jar', allowEmptyArchive: true
+			archiveArtifacts artifacts: '**/plugin/build/libs/MagicBees-*.jar', allowEmptyArchive: true
 		}
 	}
 }
