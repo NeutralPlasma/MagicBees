@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "eu.virtusdevelops"
-version = "0.0.2"
+version = "0.0.3"
 
 val minecraftVersion: String by rootProject
 val jdkVersion: Int by rootProject

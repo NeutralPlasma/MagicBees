@@ -36,8 +36,6 @@ class DurabilityRequirementParser : RequirementParser {
         val ignoreLore = if (split.size >= 5) split[4].toBoolean() else false
 
 
-        Bukkit.getConsoleSender().sendMessage("Information: $itemName, $amount, $ignoreEnchants, $ignoreLore")
-
         return AdvancedItemRequirement(itemName, amount, provider as AdvancedProvider<ItemStack, Int>, itemProvider, ignoreEnchants, ignoreLore)
     }
 }

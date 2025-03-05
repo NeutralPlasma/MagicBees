@@ -206,14 +206,10 @@ class ItemProvider(private val fileStorage: FileStorage, private val logger: Log
     }
 
     private fun getMatcher(ignoreEnchants: Boolean, ignoreLore: Boolean): BiPredicate<ItemStack, ItemStack> {
-        Bukkit.getConsoleSender().sendMessage("Info: $ignoreEnchants, $ignoreLore")
         if(!ignoreEnchants && !ignoreLore)
              return matcherAll
         if(ignoreEnchants && !ignoreLore)
             return matcherLore
-
-        Bukkit.getConsoleSender().sendMessage("Lore and enchants are ignored.")
-
         return matcherAny
     }
 

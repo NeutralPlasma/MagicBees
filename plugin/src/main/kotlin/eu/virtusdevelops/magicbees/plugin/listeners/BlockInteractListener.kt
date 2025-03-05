@@ -59,7 +59,6 @@ class BlockInteractListener(
         val hive = beeHiveController.getBeehive(blockLocation)
 
         if(hive == null && material != Material.AIR){
-
             if(item?.isSimilar(conversionItem) == true){
                 event.isCancelled = true
 
@@ -96,10 +95,15 @@ class BlockInteractListener(
 
                 return
             }
-
         }
+
+
         if(hive == null){
             return
+        }
+
+        if(material == Material.SHEARS || material == Material.GLASS_BOTTLE){
+            event.isCancelled = true
         }
 
         // process the click
@@ -108,13 +112,14 @@ class BlockInteractListener(
             return
         }
 
-        event.isCancelled = true
+
         if(event.hand != EquipmentSlot.HAND){
             return
         }
 
         if(!event.player.hasPermission("magicbees.beehive.interact")){
             translationsController.sendMessage(event.player, Messages.NO_PERMISSION, "magicbees.beehive.interact")
+            event.isCancelled = true
             return
         }
 
@@ -123,18 +128,22 @@ class BlockInteractListener(
 
         if(material == harvestToolMaterial){
             beeHiveController.harvestBeeHive(player, hive)
+            event.isCancelled = true
             return
         }
 
         if(material == harvestCombToolMaterial){
             beeHiveController.combBeeHive(player, hive)
+            event.isCancelled = true
             return
         }
 
 
 
 
+
         if(item == null){
+            event.isCancelled = true
             BeeHiveMenu(player, hive).open()
             return
         }
