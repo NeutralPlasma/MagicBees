@@ -50,8 +50,8 @@ pipeline {
 				]) {
 					sh 'chmod +x gradlew'
 					sh '''
-						export NEXUS3_USERNAME=${NEXUS1_USERNAME}
-						export NEXUS3_PASSWORD=${NEXUS1_PASSWORD}
+						export NEXUS3_USERNAME=${NEXUS3_USERNAME}
+						export NEXUS3_PASSWORD=${NEXUS3_PASSWORD}
 						./gradlew clean
 						./gradlew api:publish --info  --stacktrace
 					'''
