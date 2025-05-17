@@ -33,6 +33,32 @@ pipeline {
 
 		}
 
+		stage('PublishAPI'){
+			when {
+				expression {
+					// Check if `build.gradle.kts` has changed
+					def hasVersionChanged = sh(
+						script: 'git diff HEAD~1 HEAD -- api/build.gradle.kts | grep "^[-+]" | grep "version"',
+						returnStatus: true
+					) == 0
+					return hasVersionChanged
+				}
+			}
+			steps{
+				withCredentials([
+				usernamePassword(credentialsId: 'NEXUS3', usernameVariable: 'NEXUS3_USERNAME', passwordVariable: 'NEXUS3_PASSWORD')
+				]) {
+					sh 'chmod +x gradlew'
+					sh '''
+						export NEXUS3_USERNAME=${NEXUS1_USERNAME}
+						export NEXUS3_PASSWORD=${NEXUS1_PASSWORD}
+						./gradlew clean
+						./gradlew api:publish --info  --stacktrace
+					'''
+				}
+			}
+		}
+
 	}
 
 	post {
