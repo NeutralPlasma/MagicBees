@@ -38,7 +38,7 @@ pipeline {
             steps {
                 withChecks(name: 'MagicBees', includeStage: true) {
                     sh 'chmod +x ./gradlew'
-                    sh './gradlew clean :paper:shadowJar'
+                    sh './gradlew clean :plugin:shadowJar'
                 }
             }
         }
