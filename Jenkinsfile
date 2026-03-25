@@ -1,5 +1,24 @@
+def checksConclusion() {
+    def result = currentBuild?.currentResult ?: 'SUCCESS'
+    if (result == 'SUCCESS') {
+        return 'SUCCESS'
+    }
+    if (result == 'UNSTABLE') {
+        return 'NEUTRAL'
+    }
+    if (result == 'ABORTED') {
+        return 'CANCELED'
+    }
+    if (result == 'NOT_BUILT') {
+        return 'SKIPPED'
+    }
+    return 'FAILURE'
+}
+
 pipeline {
-    agent any
+    agent {
+        label 'linux'
+    }
 
     options {
         timestamps()
@@ -21,9 +40,15 @@ pipeline {
         stage('Repository Mining') {
             steps {
                 withChecks(name: 'MagicBees', includeStage: true) {
-                    // Discover baseline for delta/comparison
-                    mineRepository()
-                    gitDiffStat()
+                    script {
+                        try {
+                            // Discover baseline for delta/comparison
+                            mineRepository()
+                            gitDiffStat()
+                        } finally {
+                            publishChecks(status: 'COMPLETED', conclusion: checksConclusion())
+                        }
+                    }
                 }
             }
         }
@@ -37,8 +62,14 @@ pipeline {
             }
             steps {
                 withChecks(name: 'MagicBees', includeStage: true) {
-                    sh 'chmod +x ./gradlew'
-                    sh './gradlew clean :plugin:shadowJar'
+                    script {
+                        try {
+                            sh 'chmod +x ./gradlew'
+                            sh './gradlew clean :plugin:shadowJar'
+                        } finally {
+                            publishChecks(status: 'COMPLETED', conclusion: checksConclusion())
+                        }
+                    }
                 }
             }
         }
@@ -51,8 +82,14 @@ pipeline {
                 script {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         withChecks(name: 'MagicBees', includeStage: true) {
-                            sh 'chmod +x ./gradlew'
-                            sh './gradlew :api:publish'
+                            script {
+                                try {
+                                    sh 'chmod +x ./gradlew'
+                                    sh './gradlew :api:publish'
+                                } finally {
+                                    publishChecks(status: 'COMPLETED', conclusion: checksConclusion())
+                                }
+                            }
                         }
                     }
                 }
@@ -66,48 +103,52 @@ pipeline {
             steps {
                 withChecks(name: 'MagicChests', includeStage: true) {
                     script {
-                        def tagName = env.TAG_NAME
-                        if (!tagName) {
-                            tagName = env.GIT_TAG
-                        }
-                        if (!tagName) {
-                            tagName = sh(
-                                returnStdout: true,
-                                script: 'git describe --tags --exact-match 2>/dev/null || true'
-                            ).trim()
-                        }
-                        def commitSha = env.GIT_COMMIT
-                        def releaseNotes = ""
                         try {
-                            releaseNotes = generateChangelog(currentTag: tagName)
-                        } catch (e) {
-                            echo "Changelog generation failed: ${e}"
-                            releaseNotes = "Automated release for ${tagName}"
-                        }
+                            def tagName = env.TAG_NAME
+                            if (!tagName) {
+                                tagName = env.GIT_TAG
+                            }
+                            if (!tagName) {
+                                tagName = sh(
+                                    returnStdout: true,
+                                    script: 'git describe --tags --exact-match 2>/dev/null || true'
+                                ).trim()
+                            }
+                            def commitSha = env.GIT_COMMIT
+                            def releaseNotes = ""
+                            try {
+                                releaseNotes = generateChangelog(currentTag: tagName)
+                            } catch (e) {
+                                echo "Changelog generation failed: ${e}"
+                                releaseNotes = "Automated release for ${tagName}"
+                            }
 
-                        def paperJar = sh(
-                            returnStdout: true,
-                            script: 'ls -t paper/build/libs/*.jar | head -n 1'
-                        ).trim()
+                            def paperJar = sh(
+                                returnStdout: true,
+                                script: 'ls -t paper/build/libs/*.jar | head -n 1'
+                            ).trim()
 
-                        if (!tagName) {
-                            error("Tag name not found. Ensure this is a tag build or TAG_NAME/GIT_TAG is set.")
-                        }
-                        if (!paperJar) {
-                            error("No Paper shadow JAR found in paper/build/libs")
-                        }
+                            if (!tagName) {
+                                error("Tag name not found. Ensure this is a tag build or TAG_NAME/GIT_TAG is set.")
+                            }
+                            if (!paperJar) {
+                                error("No Paper shadow JAR found in paper/build/libs")
+                            }
 
-                        uploadToGithub(
-                            credentials: 'GITHUB_JENKINS',
-                            user: env.GITHUB_USER,
-                            repository: env.GITHUB_REPO,
-                            tag: tagName,
-                            commitSha: commitSha,
-                            description: releaseNotes,
-                            artifacts: [
-                                [name: "MagicBees-${tagName}.jar", path: paperJar]
-                            ]
-                        )
+                            uploadToGithub(
+                                credentials: 'GITHUB_JENKINS',
+                                user: env.GITHUB_USER,
+                                repository: env.GITHUB_REPO,
+                                tag: tagName,
+                                commitSha: commitSha,
+                                description: releaseNotes,
+                                artifacts: [
+                                    [name: "MagicBees-${tagName}.jar", path: paperJar]
+                                ]
+                            )
+                        } finally {
+                            publishChecks(status: 'COMPLETED', conclusion: checksConclusion())
+                        }
                     }
                 }
             }
